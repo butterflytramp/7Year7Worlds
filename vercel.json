@@ -1,4 +1,9 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/retrogames/(.*)", "destination": "/retrogames/index.html" },
+    { "source": "/y2k/(.*)", "destination": "/y2k/index.html" },
+    { "source": "/iceage/(.*)", "destination": "/iceage/index.html" }
+  ]
 }
