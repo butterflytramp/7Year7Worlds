@@ -219,10 +219,10 @@ img{ max-width:100%; display:block; }
 .rail a[aria-current="true"] .dash{ width:32px; opacity:1; }
 .rail{ right:calc(var(--gut) * .34); }
 
-.cue{ position:absolute; left:var(--gut); bottom:34px;
+.cue{ position:absolute; left:50%; transform:translateX(-50%); bottom:34px;
   font-family:var(--m); font-size:11px; letter-spacing:.26em; text-transform:uppercase;
   color:var(--tx-d1); text-shadow:var(--halo);
-  display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
   transition:opacity .6s var(--ease); }
 .cue::after{ content:''; width:1px; height:34px; background:linear-gradient(rgba(232,241,247,.7),transparent);
   animation:cueDrop 2.1s var(--ease-io) infinite; }
