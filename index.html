@@ -646,7 +646,7 @@ function glimpse02(){ /* world 02 — chrome night, falling 99s */
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
   t.wrapT=THREE.RepeatWrapping; return t;
 }
-function function glimpse03(){ /* world 03 — ice age, frozen landscape with mammoth */
+function glimpse03(){ /* world 03 — ice age, frozen landscape with mammoth */
   const c=document.createElement('canvas'); c.width=256; c.height=512;
   const x=c.getContext('2d');
   /* background: glacial gradient */
@@ -659,29 +659,53 @@ function function glimpse03(){ /* world 03 — ice age, frozen landscape with ma
     const sx=Math.random()*256, sy=Math.random()*512;
     const sz=.5+Math.random()*.8;
     x.save(); x.translate(sx,sy); x.scale(sz,sz);
+    /* simple snowflake/crystal pattern */
+    x.beginPath();
+    for(let a=0;a<6;a++){
+      x.rotate(Math.PI/3);
+      x.moveTo(0,0); x.lineTo(0,-12);
+      x.moveTo(-4,-8); x.lineTo(4,-8);
+    }
+    x.strokeStyle='rgba(255,255,255,.9)'; x.lineWidth=1.2; x.stroke();
+    x.restore();
+  }
+  /* distant glacier peaks — triangular shapes */
+  x.fillStyle='rgba(200,230,245,.6)';
+  x.beginPath(); x.moveTo(0,300); x.lineTo(80,200); x.lineTo(160,300); x.fill();
+  x.beginPath(); x.moveTo(120,320); x.lineTo(200,240); x.lineTo(256,320); x.fill();
+  /* icy glow at horizon */
+  const hg=x.createLinearGradient(0,280,0,350);
+  hg.addColorStop(0,'rgba(255,255,255,.3)'); hg.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=hg; x.fillRect(0,280,256,232);
+  /* MAMMOTH — woolly mammoth silhouette */
+  x.fillStyle='#5a4a3a'; /* dark brown fur */
+  /* body — large rounded shape */
+  x.beginPath(); x.ellipse(128, 310, 45, 50, 0, 0, Math.PI*2); x.fill();
+  /* head — smaller rounded shape at front-top */
+  x.beginPath(); x.ellipse(95, 255, 28, 32, 0, 0, Math.PI*2); x.fill();
+  /* hump on back */
+  x.beginPath(); x.ellipse(135, 260, 20, 28, 0, 0, Math.PI*2); x.fill();
+  /* legs — four sturdy pillars */
+  x.fillRect(105, 350, 12, 60); /* front left */
+  x.fillRect(135, 350, 12, 60); /* front right */
+  x.fillRect(115, 355, 12, 55); /* back left */
+  x.fillRect(145, 355, 12, 55); /* back right */
+  /* trunk — curved line down from head */
+  x.strokeStyle='#4a3a2a'; x.lineWidth=8;
+  x.beginPath(); x.moveTo(75, 280); x.quadraticCurveTo(65, 330, 75, 365); x.stroke();
+  /* tusks — curved ivory tusks */
+  x.strokeStyle='#e8dcc8'; x.lineWidth=5;
+  x.beginPath(); x.moveTo(88, 265); x.quadraticCurveTo(60, 300, 55, 340); x.stroke();
+  x.beginPath(); x.moveTo(102, 265); x.quadraticCurveTo(130, 300, 135, 340); x.stroke();
+  /* shaggy fur texture — add some darker patches */
+  x.fillStyle='rgba(58,48,38,.4)';
+  x.beginPath(); x.ellipse(110, 280, 15, 18, .3, 0, Math.PI*2); x.fill();
+  x.beginPath(); x.ellipse(145, 295, 12, 20, -.2, 0, Math.PI*2); x.fill();
+  /* ground frost line */
+  x.fillStyle='#ffffff'; x.fillRect(0,490,256,22);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+  t.wrapS=THREE.RepeatWrapping; return t;
 }
-function slabTex(num, cracks){
-  const c=document.createElement('canvas'); c.width=256; c.height=460;
-  const x=c.getContext('2d');
-  x.fillStyle='#f8f6f0'; x.fillRect(0,0,256,460);
-  x.strokeStyle='#eae6dc'; x.lineWidth=2; x.strokeRect(6,6,244,448);
-  /* blind emboss */
-  x.font='italic 84px Georgia'; x.textAlign='center';
-  x.fillStyle='#ffffff'; x.fillText(num,130,252);
-  x.fillStyle='#e2ddd0'; x.fillText(num,128,250);
-  if(cracks){ x.strokeStyle='rgba(127,216,232,.7)'; x.lineWidth=1.6;
-    for(let i=0;i<5;i++){
-      x.beginPath(); let cx=(i<3)?2:254, cy=60+i*85; x.moveTo(cx,cy);
-      for(let k=0;k<4;k++){ cx+=(i<3?1:-1)*(6+Math.random()*14); cy+=(Math.random()-.5)*26;
-        x.lineTo(cx,cy); }
-      x.stroke();
-    } }
-  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
-}
-
-/* ============ doors ============ */
-const clickables=[];
-const frameMat=new THREE.MeshStandardMaterial({color:0x0b2447, roughness:.5, metalness:.15});
 function doorFrame(g){
   const jamb=new THREE.BoxGeometry(.16,4.6,.28);
   const l=new THREE.Mesh(jamb,frameMat); l.position.set(-1.28,2.3,0); g.add(l);
