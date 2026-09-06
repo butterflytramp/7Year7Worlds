@@ -323,9 +323,9 @@ with hardware acceleration enabled.</p></div>
   <p class="story" style="font-size:clamp(1.2rem,2.4vw,1.8rem)">The worlds stay open. Walk back any time.</p>
   <div class="idx">
     <!-- DEMO LINKS — restore ./RetroGames/ and ./Y2K/ for production -->
-    <a href="/retrogames/" target="_blank"><span>01 · RETRO GAME WORLD</span><span class="st">ENTER →</span></a>
-    <a href="/y2k/" target="_blank"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
-    <a href="/iceage/" target="_blank"><span>03 · ICE AGE</span><span class="st">ENTER →</span></a>
+    <a href="./RetroGames/"><span>01 · RETRO GAME WORLD</span><span class="st">ENTER →</span></a>
+    <a href="./Y2K/"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
+    <div class="row next"><span>03</span><span class="st">OCT 2026</span></div>
     <div class="row"><span>04</span><span class="st">SEALED</span></div>
     <div class="row"><span>05</span><span class="st">SEALED</span></div>
     <div class="row"><span>06</span><span class="st">SEALED</span></div>
@@ -646,6 +646,42 @@ function glimpse02(){ /* world 02 — chrome night, falling 99s */
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
   t.wrapT=THREE.RepeatWrapping; return t;
 }
+function glimpse03(){ /* world 03 — ice age, frozen landscape */
+  const c=document.createElement('canvas'); c.width=256; c.height=512;
+  const x=c.getContext('2d');
+  /* background: glacial gradient */
+  const g=x.createLinearGradient(0,0,0,512);
+  g.addColorStop(0,'#e8f4f8'); g.addColorStop(.3,'#b3dfe8'); g.addColorStop(.7,'#7ec5d9'); g.addColorStop(1,'#4db3d1');
+  x.fillStyle=g; x.fillRect(0,0,256,512);
+  /* floating ice crystals — fractal-like pattern */
+  x.fillStyle='rgba(255,255,255,.8)';
+  for(let i=0;i<25;i++){
+    const sx=Math.random()*256, sy=Math.random()*512;
+    const sz=.5+Math.random()*.8;
+    x.save(); x.translate(sx,sy); x.scale(sz,sz);
+    /* simple snowflake/crystal pattern */
+    x.beginPath();
+    for(let a=0;a<6;a++){
+      x.rotate(Math.PI/3);
+      x.moveTo(0,0); x.lineTo(0,-12);
+      x.moveTo(-4,-8); x.lineTo(4,-8);
+    }
+    x.strokeStyle='rgba(255,255,255,.9)'; x.lineWidth=1.2; x.stroke();
+    x.restore();
+  }
+  /* distant glacier peaks — triangular shapes */
+  x.fillStyle='rgba(200,230,245,.6)';
+  x.beginPath(); x.moveTo(0,300); x.lineTo(80,200); x.lineTo(160,300); x.fill();
+  x.beginPath(); x.moveTo(120,320); x.lineTo(200,240); x.lineTo(256,320); x.fill();
+  /* icy glow at horizon */
+  const hg=x.createLinearGradient(0,280,0,350);
+  hg.addColorStop(0,'rgba(255,255,255,.3)'); hg.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=hg; x.fillRect(0,280,256,232);
+  /* ground frost line */
+  x.fillStyle='#ffffff'; x.fillRect(0,490,256,22);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+  t.wrapS=THREE.RepeatWrapping; return t;
+}
 function slabTex(num, cracks){
   const c=document.createElement('canvas'); c.width=256; c.height=460;
   const x=c.getContext('2d');
@@ -751,10 +787,10 @@ function slabDoor(z, side, num, cracks){
   return slab;
 }
 /* DEMO LINKS — restore './RetroGames/' and './Y2K/' for production */
-const DEMO_L='./retrogames/', DEMO_R='./y2k/';
+const DEMO_L='./RetroGames/', DEMO_R='./Y2K/';
 const d01=openDoor(-76, -1, glimpse01(), 'rgba(33,33,222,.5)', 0x4d5dff, DEMO_L);
 const d02=openDoor(-104,  1, glimpse02(), 'rgba(255,180,84,.55)', 0xffb454, DEMO_R);
-slabDoor(-140, -1, '03', true);
+const d03=openDoor(-140, -1, glimpse03(), 'rgba(100,200,220,.55)', 0x64c8dc, './iceage-world/');
 slabDoor(-152,  1, '04', false);
 slabDoor(-157, -1, '05', false);
 slabDoor(-162,  1, '06', false);
@@ -970,7 +1006,7 @@ addEventListener('click',e=>{
   const hit=ray.intersectObjects(clickables,false)[0];
   if(!hit) return;
   const u=hit.object.userData;
-  if(u.kind==='door') window.open(u.href, '_blank');
+  if(u.kind==='door') location.href=u.href;
   else if(u.kind==='door7'){
     knockT=clock3.elapsedTime;
     soon.style.left=(e.clientX+14)+'px'; soon.style.top=(e.clientY-10)+'px';
