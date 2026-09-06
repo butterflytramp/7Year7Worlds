@@ -758,6 +758,57 @@ html.rm .act--beats .stage{ position:static; height:auto; padding-block:16vh; }
 html.rm .act--hero,html.rm .act--body,html.rm .act--made,
 html.rm .act--threshold,html.rm .act--white,html.rm #closing{ height:auto; }
 html.rm .stage{ position:static; height:auto; min-height:auto; padding-block:16vh; }
+/* Hide intervention numbering */
+.iv-num { display: none; }
+
+/* Style section headers with prominent treatment */
+.iv-intro h2, #indiaH {
+  font-size: clamp(28px, 3.2vw, 48px);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  margin-bottom: 20px;
+  animation: slideInUp 0.8s ease-out;
+}
+
+.iv-intro p {
+  font-family: Georgia, serif;
+  font-size: clamp(16px, 1.1vw, 20px);
+  line-height: 1.7;
+  color: var(--tx-d1);
+  max-width: 65%;
+}
+
+/* Flat background for "We crossed a..." section */
+.threshold {
+  background: linear-gradient(to bottom, var(--pale) 0%, var(--pale) 100%);
+  padding: 80px 0;
+}
+
+.threshold h2 {
+  font-size: clamp(36px, 4vw, 58px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  margin-bottom: 30px;
+}
+
+/* Better subcopy typography */
+.proof-body p, .iv-body p {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: clamp(15px, 1.05vw, 18px);
+  line-height: 1.75;
+  letter-spacing: 0.3px;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
 </head>
 <body>
@@ -1113,17 +1164,33 @@ html.rm .stage{ position:static; height:auto; min-height:auto; padding-block:16v
   </section>
 
   <!-- ============ DESIGN A PLANET ============ -->
-  <section id="planet" aria-labelledby="dpH">
-    <div class="dp">
-      <div class="dp-head">
-        <p class="eyebrow" data-rv>Design a planet</p>
-        <h2 class="h-2" id="dpH" data-rv="mask">Four decisions. They carry.</h2>
-        <p data-rv>Nothing here is hypothetical — every option is something a government or a village has already done. Choose, and the last part of this site is built out of what you chose.</p>
+  <section id="planet" aria-labelledby="dpH" style="background: linear-gradient(to bottom, var(--void) 0%, var(--deep) 50%, var(--void) 100%); position: relative;">
+    <div class="stage" style="padding-block: 80px;">
+      <div class="wrap">
+        <div class="dp-head" style="margin-bottom: 60px; text-align: center;">
+          <p class="eyebrow" data-rv style="margin-bottom: 20px;">Design a planet</p>
+          <h2 class="h-2" id="dpH" data-rv="mask" style="font-size: clamp(36px, 4vw, 58px); margin-bottom: 30px;">Four decisions. They carry.</h2>
+          <p data-rv style="font-family: Georgia, serif; font-size: clamp(16px, 1.05vw, 18px); line-height: 1.8; max-width: 70ch; margin: 0 auto; color: var(--tx-d2);">
+            Nothing here is hypothetical — every option is something a government or a village has already done. Choose, and the last part of this site is built out of what you chose.
+          </p>
+        </div>
       </div>
-      <div class="qs" id="qs"></div>
-      <div class="dp-out">
-        <p class="h-3" id="dpOut">Make four choices and the closing environment will be built from them.</p>
-        <p>Your planet is rendered live in the closing scene below. Choices are kept in this browser tab only.</p>
+    </div>
+
+    <!-- Questions and choices spread across viewport height -->
+    <div style="background: rgba(10, 33, 56, 0.5); padding: 60px var(--gut); backdrop-filter: blur(4px);">
+      <div class="wrap">
+        <div class="qs" id="qs" style="display: grid; gap: 40px;"></div>
+      </div>
+    </div>
+
+    <!-- Output / Preview section -->
+    <div style="background: linear-gradient(to bottom, rgba(10, 33, 56, 0.5), var(--void)); padding: 80px var(--gut);">
+      <div class="wrap" style="max-width: 65ch; margin: 0 auto;">
+        <div class="dp-out" style="text-align: center; opacity: 0; animation: fadeInUp 0.8s ease-out 0.3s forwards;">
+          <p class="h-3" id="dpOut" style="margin-bottom: 20px;">Make four choices and the closing environment will be built from them.</p>
+          <p style="font-family: Georgia, serif; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.7; color: var(--tx-d3); margin: 0;">Your planet is rendered live in the closing scene below. Choices are kept in this browser tab only.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -1136,6 +1203,22 @@ html.rm .stage{ position:static; height:auto; min-height:auto; padding-block:16v
         <p data-rv>By the geological definition we are still in an ice age — there is permanent ice at both poles, and the Holocene is an intermission. Everything we point at as evidence of being human was invented during the cold, by people under climate stress.</p>
         <p class="final" data-rv>The ice didn't interrupt us. It invented us.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 YEARS 7 WORLDS CONTEXT ============ -->
+  <section class="context-section" style="background: linear-gradient(to bottom, var(--void) 0%, var(--deep) 100%); padding: 120px var(--gut); color: var(--frost); position: relative; z-index: 10;">
+    <div class="wrap" style="max-width: 65ch; margin: 0 auto;">
+      <h2 style="font-size: clamp(32px, 3.5vw, 52px); font-weight: 300; letter-spacing: -0.03em; margin-bottom: 30px; line-height: 1.3;" data-rv>About 7 Years 7 Worlds</h2>
+      <p style="font-family: Georgia, serif; font-size: clamp(16px, 1.05vw, 18px); line-height: 1.8; margin-bottom: 20px; color: var(--tx-d2);" data-rv>
+        This is World 03 of a seven-part journey exploring climate intervention across different regions and timescales. Each world examines a moment in time and the decisions being made in real places to reshape how humans live on a warming planet.
+      </p>
+      <p style="font-family: Georgia, serif; font-size: clamp(16px, 1.05vw, 18px); line-height: 1.8; margin-bottom: 20px; color: var(--tx-d2);" data-rv>
+        The choices you made above — your four decisions about energy, agriculture, cooling, and restoration — are not hypothetical. Each one is under way somewhere. The environment below reflects your choices, built from real interventions happening right now in India and around the world.
+      </p>
+      <p style="font-family: Georgia, serif; font-size: clamp(16px, 1.05vw, 18px); line-height: 1.8; color: var(--tx-d2);" data-rv>
+        Watch as your planet emerges from these decisions. Some will work. Some won't. All of them are what we have.
+      </p>
     </div>
   </section>
 
