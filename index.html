@@ -646,7 +646,7 @@ function glimpse02(){ /* world 02 — chrome night, falling 99s */
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
   t.wrapT=THREE.RepeatWrapping; return t;
 }
-function glimpse03(){ /* world 03 — ice age, frozen landscape */
+function function glimpse03(){ /* world 03 — ice age, frozen landscape with mammoth */
   const c=document.createElement('canvas'); c.width=256; c.height=512;
   const x=c.getContext('2d');
   /* background: glacial gradient */
@@ -659,28 +659,6 @@ function glimpse03(){ /* world 03 — ice age, frozen landscape */
     const sx=Math.random()*256, sy=Math.random()*512;
     const sz=.5+Math.random()*.8;
     x.save(); x.translate(sx,sy); x.scale(sz,sz);
-    /* simple snowflake/crystal pattern */
-    x.beginPath();
-    for(let a=0;a<6;a++){
-      x.rotate(Math.PI/3);
-      x.moveTo(0,0); x.lineTo(0,-12);
-      x.moveTo(-4,-8); x.lineTo(4,-8);
-    }
-    x.strokeStyle='rgba(255,255,255,.9)'; x.lineWidth=1.2; x.stroke();
-    x.restore();
-  }
-  /* distant glacier peaks — triangular shapes */
-  x.fillStyle='rgba(200,230,245,.6)';
-  x.beginPath(); x.moveTo(0,300); x.lineTo(80,200); x.lineTo(160,300); x.fill();
-  x.beginPath(); x.moveTo(120,320); x.lineTo(200,240); x.lineTo(256,320); x.fill();
-  /* icy glow at horizon */
-  const hg=x.createLinearGradient(0,280,0,350);
-  hg.addColorStop(0,'rgba(255,255,255,.3)'); hg.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle=hg; x.fillRect(0,280,256,232);
-  /* ground frost line */
-  x.fillStyle='#ffffff'; x.fillRect(0,490,256,22);
-  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
-  t.wrapS=THREE.RepeatWrapping; return t;
 }
 function slabTex(num, cracks){
   const c=document.createElement('canvas'); c.width=256; c.height=460;
