@@ -109,7 +109,7 @@
   .plaq.brass .invite .txt{color:#4a3a1c}
   /* WALL TEXT TRIAL — narration lives on the 3D walls; delete this rule to
      bring back the bottom-left placards */
-  .act.onwall{display:none}
+  /* .act.onwall removed with the wall narration */
   /* ============ END QUIET TEXT MODE ============ */
 
   /* ---------- masthead (constant across worlds — light version) ---------- */
@@ -217,43 +217,9 @@ with hardware acceleration enabled.</p></div>
   <div class="mh-kicker">Seven Years · Seven Worlds</div>
 </section>
 
-<!-- BEAT 1 · confession -->
-<section class="act onwall" data-s="0.11" data-e="0.155">
-  <div class="plaq">
-  <div class="eyebrow">THE CONFESSION · 01</div>
-  <p class="story">Here is what nobody tells you about spending seven years
-  running a creative studio.</p>
-</div>
-</section>
 
-<!-- BEAT 2 · thesis -->
-<section class="act onwall" data-s="0.165" data-e="0.225">
-  <div class="plaq">
-  <div class="eyebrow">THE THESIS · 02</div>
-  <p class="thesis">You don't build a style.<br>You absorb worlds.</p>
-</div>
-</section>
 
-<!-- BEAT 3 · the meal -->
-<section class="act onwall" data-s="0.235" data-e="0.292">
-  <div class="plaq">
-  <div class="eyebrow">THE MEAL · 03</div>
-  <p class="story">Art Deco. Tropicália. Soviet propaganda. Bollywood posters.
-  Japanese city pop. The sleeve of a Factory record. You absorb all of it —
-  slowly, deliberately, with full attention — and it changes the composition
-  of what you make.</p>
-</div>
-</section>
 
-<!-- BEAT 4 · antropofagia -->
-<section class="act onwall" data-s="0.302" data-e="0.35">
-  <div class="plaq">
-  <div class="eyebrow">ANTROPOFAGIA · 04</div>
-  <p class="story">The Tropicalists had a name for this.
-  <span class="hat">Antropofagia.</span> Cultural cannibalism. You devour what
-  you love, and you become something that could not have existed without it.</p>
-</div>
-</section>
 
 <!-- BEAT 5 · door 01 -->
 <section class="act doorlbl" data-s="0.365" data-e="0.425">
@@ -263,14 +229,6 @@ with hardware acceleration enabled.</p></div>
 </div>
 </section>
 
-<!-- BEAT 6 · between doors -->
-<section class="act onwall" data-s="0.435" data-e="0.49">
-  <div class="plaq">
-  <div class="eyebrow">SIX ACTS OF LOVE · 05</div>
-  <p class="story">Six years of that. Six worlds. Six acts of love toward the
-  things that shaped us.</p>
-</div>
-</section>
 
 <!-- BEAT 7 · door 02 -->
 <section class="act doorlbl" data-s="0.505" data-e="0.565">
@@ -280,16 +238,6 @@ with hardware acceleration enabled.</p></div>
 </div>
 </section>
 
-<!-- BEAT 8 · the question -->
-<section class="act onwall" data-s="0.578" data-e="0.645">
-  <div class="plaq">
-  <div class="eyebrow">THE REACTION · 06</div>
-  <p class="story">Every day for seven years, a specific group of people in a
-  specific city has been saying the same three words. Not as a question.
-  As a reaction. The thing you say when you walk into a room and it stops you.</p>
-  <p class="thesis" style="font-size:clamp(1.9rem,4.6vw,3.4rem)">How About That!</p>
-</div>
-</section>
 
 <!-- BEAT 9 · door 03 (next) -->
 <section class="act doorlbl" data-s="0.66" data-e="0.71">
@@ -299,24 +247,7 @@ with hardware acceleration enabled.</p></div>
 </div>
 </section>
 
-<!-- BEAT 10 · sealed run -->
-<section class="act onwall" data-s="0.72" data-e="0.785">
-  <div class="plaq">
-  <div class="eyebrow">THE THREAD · 07</div>
-  <p class="story">They build. Each world references the next — a detail that
-  only makes sense in retrospect. A thread runs through all six.</p>
-</div>
-</section>
 
-<!-- BEAT 11 · the approach -->
-<section class="act onwall" data-s="0.8" data-e="0.86">
-  <div class="plaq">
-  <div class="eyebrow">THE SEVENTH · 08</div>
-  <p class="story">And then there is the seventh. The seventh world is the one
-  that happens after you've absorbed everything — the world you make when you stop
-  looking outward and look at what you've become.</p>
-</div>
-</section>
 
 <!-- BEAT 12 · door 07 -->
 <section class="act doorlbl" data-s="0.875" data-e="0.925">
@@ -840,99 +771,36 @@ function hangArt(src, ratio, h, z, side, y=2.7){
   scene.add(g); artGroups.push(g);
 }
 /* hung between doors and columns — sizes follow the frame hierarchy */
-hangArt('a1.jpg',1.667,1.9, -27, -1);
-hangArt('a2.jpg',.8,  2.5, -41,   1);
-hangArt('a9.jpg',1.57, 1.8, -55, -1);
-hangArt('a3.jpg',.8,  2.2, -69,   1);
-hangArt('a4.jpg',.8,  2.2, -83,  -1);
-hangArt('a11.jpg',.821,2.4, -97,  1);
-hangArt('a10.jpg',.797,2.4,-111, -1);
-hangArt('a6.jpg',1.048,3.0,-125,  1);      /* hero — the mural */
-hangArt('a5.jpg',.8,  2.0, -133,  1);
-hangArt('a7.jpg',1.667,1.9,-139,  1);
-hangArt('a12.jpg',.71, 2.4,-168,  1);
-hangArt('a8.jpg',.784,2.5,-178, -1);       /* under the navy vault */
-hangArt('a13.jpg',0.984,2.2,-92,-1);
-hangArt('a14.jpg',0.999,2.2,-108,1);
-hangArt('a15.jpg',1.778,1.8,-163,-1);
-/* --- Museum Frames, 8 Sept 2026 --- */
-hangArt('truck.jpg',1.499,2.0, -21, -1);
-hangArt('cricket.jpg',1.664,2.1, -35, 1);
-hangArt('paperbag.jpg',1.687,2.2, -49, -1);
-hangArt('heroslider.jpg',1.723,2.0, -63, 1);
-hangArt('solvecube.jpg',1.778,1.9, -74, 1);
-hangArt('layer.jpg',1.777,1.7, -105, -1);
-hangArt('sloka.jpg',0.8,2.6, -115.5, -1);
-hangArt('cherrypickers.jpg',1.599,2.2, -117, 1);
-hangArt('frame-a.jpg',1.6,2.0, -121, -1);
-hangArt('frame-c.jpg',1.646,2.0, -133, -1);
-hangArt('frame-b.jpg',1.6,2.1, -145, 1);
+hangArt('a2.jpg',0.8,2.5,-20.0, 1);
+hangArt('a1.jpg',1.667,1.9,-20.6, -1);
+hangArt('truck.jpg',1.499,2.0,-30.2, -1);
+hangArt('cricket.jpg',1.664,2.1,-34.6, 1);
+hangArt('a9.jpg',1.57,1.8,-39.6, -1);
+hangArt('a3.jpg',0.8,2.2,-43.8, 1);
+hangArt('paperbag.jpg',1.687,2.2,-49.3, -1);
+hangArt('heroslider.jpg',1.723,2.0,-52.9, 1);
+hangArt('a4.jpg',0.8,2.2,-58.6, -1);
+hangArt('solvecube.jpg',1.778,1.9,-62.8, 1);
+hangArt('a11.jpg',0.821,2.4,-72.0, 1);
+hangArt('a13.jpg',0.984,2.2,-80.9, -1);
+hangArt('a14.jpg',0.999,2.2,-86.0, 1);
+hangArt('layer.jpg',1.777,1.7,-90.0, -1);
+hangArt('sloka.jpg',0.8,2.6,-94.6, 1);
+hangArt('a10.jpg',0.797,2.4,-103.9, -1);
+hangArt('frame-a.jpg',1.6,2.0,-112.9, -1);
+hangArt('a6.jpg',1.048,3.0,-116.5, 1);      /* hero — the mural */
+hangArt('a15.jpg',1.778,1.8,-122.6, -1);
+hangArt('a5.jpg',0.8,2.0,-125.3, 1);
+hangArt('cherrypickers.jpg',1.599,2.2,-132.7, -1);
+hangArt('a7.jpg',1.667,1.9,-134.2, 1);
+hangArt('frame-b.jpg',1.6,2.1,-144.0, 1);
+hangArt('frame-c.jpg',1.646,2.0,-145.4, -1);
+hangArt('a12.jpg',0.71,2.4,-156.7, 1);
+hangArt('a8.jpg',0.784,2.5,-161.8, -1);       /* under the navy vault */
 
-/* ============ vinyl wall text — the narration, on the walls ============ */
-const WALLTEXT=[
- {z:-20,  side: 1, eb:'THE CONFESSION \u00b7 01', big:false,
-  txt:'Here is what nobody tells you about seven years of running a studio.'},
- {z:-34,  side:-1, eb:'THE THESIS \u00b7 02', big:true,
-  txt:'You don\u2019t build a style.\nYou absorb worlds.'},
- {z:-48,  side: 1, eb:'THE MEAL \u00b7 03', big:false,
-  txt:'Art Deco. Tropic\u00e1lia. Soviet propaganda. Bollywood posters. City pop. Factory Records. You absorb all of it \u2014 and it changes what you make.'},
- {z:-62,  side:-1, eb:'ANTROPOFAGIA \u00b7 04', big:false,
-  txt:'The Tropicalists had a name for it. Antropofagia \u2014 you devour what you love, and become something that couldn\u2019t exist without it.'},
- {z:-90,  side: 1, eb:'SIX ACTS OF LOVE \u00b7 05', big:false,
-  txt:'Six years. Six worlds. Six acts of love.'},
- {z:-118, side:-1, eb:'THE REACTION \u00b7 06', big:false,
-  txt:'For seven years, one studio has been saying the same three words. Not a question \u2014 a reaction.\nHow About That!'},
- {z:-146, side: 1, eb:'THE THREAD \u00b7 07', big:false,
-  txt:'Each world hints at the next. A thread runs through all six.'},
- {z:-170, side:-1, eb:'THE SEVENTH \u00b7 08', big:false,
-  txt:'And then, the seventh \u2014 the world you make when you stop looking outward, and look at what you\u2019ve become.'},
-];
-function buildWallText(){
-  for(const s of WALLTEXT){
-    const W=768, PAD=48;
-    const storySize=s.big?84:54, lh=Math.round(storySize*1.5);
-    const storyFont='italic 500 '+storySize+'px "Cormorant Garamond", Georgia, serif';
-    const c=document.createElement('canvas');
-    let x=c.getContext('2d');
-    x.font=storyFont;
-    const lines=[];
-    for(const para of s.txt.split('\n')){
-      let line='';
-      for(const w of para.split(' ')){
-        const t=line?line+' '+w:w;
-        if(x.measureText(t).width>W-2*PAD){ lines.push(line); line=w; }
-        else line=t;
-      }
-      lines.push(line);
-    }
-    const H=PAD+34+28+lines.length*lh+PAD;
-    c.width=W; c.height=H;
-    x=c.getContext('2d');
-    try{ x.letterSpacing='7px'; }catch(e){}
-    x.font='500 24px "IBM Plex Mono", monospace';
-    x.fillStyle='#6b675d';
-    x.fillText(s.eb, PAD, PAD+22);
-    try{ x.letterSpacing='0px'; }catch(e){}
-    x.font=storyFont; x.fillStyle='#2b2925';
-    lines.forEach((ln,i)=>x.fillText(ln, PAD, PAD+34+28+ (i+.8)*lh));
-    const tex=new THREE.CanvasTexture(c);
-    tex.colorSpace=THREE.SRGBColorSpace;
-    tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
-    const pw=s.big?4.2:3.4, ph=pw*H/W;
-    const m=new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:0});
-    m.userData.cap=1; corridorMats.push(m);
-    const panel=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph), m);
-    panel.position.set(0, 2.9, .01);
-    const g=new THREE.Group();
-    g.add(panel);
-    g.position.set(s.side*5.6, 0, s.z);
-    g.rotation.y=s.side>0? -Math.PI/2+.15 : Math.PI/2-.15;
-    scene.add(g);
-  }
-}
-if(document.fonts && document.fonts.ready)
-  document.fonts.ready.then(buildWallText);
-else buildWallText();
+/* The vinyl wall narration used to run along these walls. Removed — the
+   story is carried by the doors and the collection now, and the wall
+   space it occupied has been given over to frames. */
 
 /* door 07 — the black door */
 const door7=new THREE.Mesh(new THREE.BoxGeometry(2.8,5,.18),
