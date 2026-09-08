@@ -799,7 +799,7 @@ function openDoor(z, side, tex, poolHex, lightHex, href, kind){
   scene.add(motes);
   const fx={side,z,shaft,shaft2,ring,motes,mg,off,dz,dy,N,
     pivA,pivB,leaks:[leak,leakB],open:DOOR_OPEN,aj:0,
-    debris,inLight,RD};
+    debris,inLight,RD,kind};
   doorFX.push(fx);
   return {leak,pl,pool,fx};
 }
@@ -1104,13 +1104,34 @@ function frame(){
     /* the alley behind only exists once the picture opens */
     f.inLight.intensity=7*f.aj;
     if(f.aj>.006){
+      /* each world moves the way that world moves */
       for(const m of f.debris){
         const u=m.userData;
-        m.position.set(Math.sin(t*.33+u.ph)*u.rr,
-                       2.25 + Math.cos(t*.25+u.ph*1.7)*1.55,
-                       -u.dp + Math.sin(t*.2+u.ph)*.3);
-        m.rotateOnAxis(u.ax, .007*u.sp);
-        m.material.opacity=.96*f.aj;
+        if(f.kind==='pixel'){
+          /* sprite logic: quantised to a grid, rising and wrapping, snapping
+             through 90-degree turns rather than rotating smoothly */
+          const st=.17, q=v=>Math.round(v/st)*st;
+          const rise=(t*.15*u.sp+u.ph/6.283)%1;
+          m.position.set(q(Math.sin(u.ph*3)*u.rr), q(.6+rise*3.4), q(-u.dp));
+          m.rotation.set(0, Math.floor(t*1.6+u.ph)*Math.PI/2, 0);
+          m.material.opacity=.96*f.aj*Math.min(1, 6*Math.min(rise,1-rise));
+        } else if(f.kind==='chrome'){
+          /* liquid metal: slow continuous orbit, always turning */
+          const sp=t*.17+u.ph;
+          m.position.set(Math.cos(sp)*u.rr,
+                         2.25+Math.sin(sp*.78)*1.35,
+                         -u.dp+Math.sin(sp*.55)*.32);
+          m.rotateOnAxis(u.ax, .013*u.sp);
+          m.material.opacity=.96*f.aj;
+        } else {
+          /* shards settle like snow — drifting down, swaying, tumbling slowly */
+          const fall=(t*.06*u.sp+u.ph/6.283)%1;
+          m.position.set(Math.sin(u.ph*5)*u.rr*.82 + Math.sin(t*.45+u.ph)*.18,
+                         4.4-fall*4.1,
+                         -u.dp+Math.cos(t*.28+u.ph)*.25);
+          m.rotateOnAxis(u.ax, .0045*u.sp);
+          m.material.opacity=.96*f.aj*Math.min(1, 7*Math.min(fall,1-fall));
+        }
       }
     } else for(const m of f.debris) m.material.opacity=0;
     /* more gap, more spill */
