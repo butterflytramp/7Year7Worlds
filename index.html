@@ -50,6 +50,21 @@
     letter-spacing:.34em;color:#ffffff;text-transform:uppercase;text-shadow:0 0 12px rgba(0,0,0,.8);background:rgba(0,0,0,.4);padding:4px 8px;border-radius:3px}
   .act .lbl b{color:#ffffff;font-weight:600;text-shadow:0 0 14px rgba(0,0,0,.9)}
 
+  /* floor plaque — museum wayfinding */
+  .floor-plaque{position:fixed;bottom:8vh;left:50%;transform:translateX(-50%);z-index:5;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.28));
+    backdrop-filter:blur(2px);
+    padding:12px 20px;border-radius:2px;
+    border:1px solid rgba(194,84,46,.15);}
+  .floor-plaque .arrow{font-size:20px;color:#c2542e;font-weight:600;line-height:1;animation:plaque-float 2.5s ease-in-out infinite}
+  .floor-plaque .text{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;
+    font-size:13px;color:#fbfaf7;letter-spacing:.04em;line-height:1.3}
+  .floor-plaque .cta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c2542e;
+    font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+  @keyframes plaque-float{0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)}}
+  @media (max-width:760px){.floor-plaque{bottom:6vh;padding:10px 16px}.floor-plaque .text{font-size:12px}.floor-plaque .arrow{font-size:18px}}
+
   /* door labels sit lower, near the door */
   .act.doorlbl{justify-content:flex-end;padding-bottom:12vh;gap:.7rem}
 
@@ -345,6 +360,12 @@ with hardware acceleration enabled.</p></div>
 </div>
 
 <div id="scroll-space"></div>
+
+<div class="floor-plaque">
+  <div class="arrow">↑</div>
+  <div class="text">A world awaits</div>
+  <div class="cta">Tap to enter</div>
+</div>
 
 <script type="importmap">
 {"imports":{
