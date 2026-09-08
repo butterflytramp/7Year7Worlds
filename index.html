@@ -51,19 +51,10 @@
   .act .lbl b{color:#ffffff;font-weight:600;text-shadow:0 0 14px rgba(0,0,0,.9)}
 
 
-  /* world arc wayfinding */
-  .world-arc{position:fixed;top:0;left:0;width:100%;height:100%;z-index:4;pointer-events:none}
-  .arc-svg{width:100%;height:100%;opacity:0;transition:opacity .6s ease}
-  .arc-svg.active{opacity:1}
-  .arc-line{fill:none;stroke-linecap:round;stroke-width:1.5;opacity:.7;filter:drop-shadow(0 0 4px currentColor)}
-  .arc-line.world01{stroke:#0066ff;color:#0066ff}
-  .arc-line.world02{stroke:#ff3366;color:#ff3366}
-  .arc-text{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;font-weight:400;letter-spacing:.02em}
-  .arc-text.world01{fill:#0066ff}
-  .arc-text.world02{fill:#ff3366}
-  .arc-cta{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.65}
-  .arc-cta.world01{fill:#0066ff}
-  .arc-cta.world02{fill:#ff3366}
+  /* dynamic label colors */
+  .lbl.world-active{transition:color .6s ease}
+  .lbl.world01-active{color:#0066ff}
+  .lbl.world02-active{color:#ff3366}
 
   /* door labels sit lower, near the door */
   .act.doorlbl{justify-content:flex-end;padding-bottom:12vh;gap:.7rem}
@@ -258,8 +249,8 @@ with hardware acceleration enabled.</p></div>
 <!-- BEAT 5 · door 01 -->
 <section class="act doorlbl" data-s="0.365" data-e="0.425">
   <div class="plaq">
-  <div class="lbl"><b>WORLD 01 · OPEN</b></div>
-  <div class="lbl">A world is open. Enter here.</div>
+  <div class="lbl world01-label"><b>WORLD 01 · OPEN</b></div>
+  <div class="lbl world01-label">World 01 is open. Enter</div>
 </div>
 </section>
 
@@ -275,8 +266,8 @@ with hardware acceleration enabled.</p></div>
 <!-- BEAT 7 · door 02 -->
 <section class="act doorlbl" data-s="0.505" data-e="0.565">
   <div class="plaq">
-  <div class="lbl"><b>WORLD 02 · OPEN</b></div>
-  <div class="lbl">A world is open. Enter here.</div>
+  <div class="lbl world02-label"><b>WORLD 02 · OPEN</b></div>
+  <div class="lbl world02-label">World 02 is open. Enter</div>
 </div>
 </section>
 
@@ -361,31 +352,6 @@ with hardware acceleration enabled.</p></div>
 
 <div id="scroll-space"></div>
 
-<div class="world-arc">
-  <svg class="arc-svg world01-arc" viewBox="0 0 800 600" preserveAspectRatio="none">
-    <defs>
-      <marker id="arrowhead-w01" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-        <polygon points="0 0, 10 3, 0 6" fill="#0066ff"/>
-      </marker>
-    </defs>
-    <path class="arc-line world01" d="M 500 350 Q 300 200, 120 400" marker-end="url(#arrowhead-w01)"/>
-    <text class="arc-text world01" x="60" y="370">Enter</text>
-    <text class="arc-text world01" x="60" y="390" style="font-size:14px; font-weight:500;">World 01</text>
-    <text class="arc-cta world01" x="60" y="408">Retro Games</text>
-  </svg>
-
-  <svg class="arc-svg world02-arc" viewBox="0 0 800 600" preserveAspectRatio="none">
-    <defs>
-      <marker id="arrowhead-w02" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-        <polygon points="0 0, 10 3, 0 6" fill="#ff3366"/>
-      </marker>
-    </defs>
-    <path class="arc-line world02" d="M 500 350 Q 300 200, 120 400" marker-end="url(#arrowhead-w02)"/>
-    <text class="arc-text world02" x="60" y="370">Enter</text>
-    <text class="arc-text world02" x="60" y="390" style="font-size:14px; font-weight:500;">World 02</text>
-    <text class="arc-cta world02" x="60" y="408">Y2K</text>
-  </svg>
-</div>
 
 <script type="importmap">
 {"imports":{
@@ -986,16 +952,16 @@ const sevenwrap=document.getElementById('sevenwrap');
 const whiteout=document.getElementById('whiteout');
 
 let target=0, p=0, mx=0, my=0, smx=0, smy=0;
-const w01Arc=document.querySelector('.world01-arc');
-const w02Arc=document.querySelector('.world02-arc');
+const w01Labels=document.querySelectorAll('.world01-label');
+const w02Labels=document.querySelectorAll('.world02-label');
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
   target=h>0?scrollY/h:0;
-  /* arc visibility — show only when very close to room */
-  const w01Range=target>=.28 && target<=.34;
-  const w02Range=target>=.54 && target<=.60;
-  w01Arc.classList.toggle('active',w01Range);
-  w02Arc.classList.toggle('active',w02Range);
+  /* label color change when near room */
+  const w01Active=target>=.28 && target<=.34;
+  const w02Active=target>=.54 && target<=.60;
+  w01Labels.forEach(el=>el.classList.toggle('world01-active',w01Active));
+  w02Labels.forEach(el=>el.classList.toggle('world02-active',w02Active));
 },{passive:true});
 addEventListener('pointermove',e=>{
   mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2;
