@@ -47,8 +47,11 @@
   .act .thesis{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;
     font-size:clamp(2.4rem,7vw,5.6rem);line-height:1.15;color:var(--ink);max-width:1000px}
   .act .lbl{font-family:'IBM Plex Mono',monospace;font-size:.72rem;
-    letter-spacing:.34em;color:#ffffff;text-transform:uppercase;text-shadow:0 0 12px rgba(0,0,0,.8);background:rgba(0,0,0,.4);padding:4px 8px;border-radius:3px}
-  .act .lbl b{color:#ffffff;font-weight:600;text-shadow:0 0 14px rgba(0,0,0,.9)}
+    letter-spacing:.34em;color:#1c1c1a;text-transform:uppercase;
+    background:rgba(255,255,255,.74);backdrop-filter:blur(3px);
+    padding:5px 10px;border-radius:3px;text-shadow:none;
+    box-shadow:0 1px 3px rgba(28,28,26,.08)}
+  .act .lbl b{color:#0b2447;font-weight:600;text-shadow:none}
 
 
   /* dynamic label colours — override the white .act .lbl rules */
@@ -169,10 +172,11 @@
 
   #hud{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;
     align-items:center;gap:14px;padding:12px 18px;pointer-events:none}
-  #track{flex:1;height:2px;background:rgba(28,28,26,.1);border-radius:4px;overflow:hidden}
-  #fill{height:100%;width:0;background:var(--navy)}
+  #track{flex:1;height:2px;background:rgba(255,255,255,.35);border-radius:4px;overflow:hidden}
+  #fill{height:100%;width:0;background:#ffffff}
   #hud .lbl{font-family:'IBM Plex Mono',monospace;font-size:.58rem;
-    letter-spacing:.24em;color:var(--faint);white-space:nowrap}
+    letter-spacing:.24em;color:#ffffff;white-space:nowrap;
+    text-shadow:0 1px 4px rgba(28,28,26,.45)}
 
   #nogl{position:fixed;inset:0;z-index:9;display:none;place-items:center;
     background:var(--paper);text-align:center;padding:2rem}
