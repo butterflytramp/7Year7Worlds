@@ -58,6 +58,7 @@
   .lbl{transition:color .6s ease}
   .lbl.world01-active,.lbl.world01-active b{color:#0066ff !important}
   .lbl.world02-active,.lbl.world02-active b{color:#ff3366 !important}
+  .lbl.world03-active,.lbl.world03-active b{color:#1f8fb0 !important}
 
   /* custom cursors on door hover */
   body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}
@@ -224,8 +225,8 @@ with hardware acceleration enabled.</p></div>
 <!-- BEAT 5 · door 01 -->
 <section class="act doorlbl" data-s="0.365" data-e="0.425">
   <div class="plaq">
-  <div class="lbl world01-label"><b>WORLD 01 · OPEN</b></div>
-  <div class="lbl world01-label">World 01 is open. Enter</div>
+  <div class="lbl world01-label"><b>World 01 · Retro Games</b></div>
+  <div class="lbl world01-label">Open · Enter</div>
 </div>
 </section>
 
@@ -233,17 +234,41 @@ with hardware acceleration enabled.</p></div>
 <!-- BEAT 7 · door 02 -->
 <section class="act doorlbl" data-s="0.505" data-e="0.565">
   <div class="plaq">
-  <div class="lbl world02-label"><b>WORLD 02 · OPEN</b></div>
-  <div class="lbl world02-label">World 02 is open. Enter</div>
+  <div class="lbl world02-label"><b>World 02 · Y2K</b></div>
+  <div class="lbl world02-label">Open · Enter</div>
 </div>
 </section>
 
 
-<!-- BEAT 9 · door 03 (next) -->
+<!-- door 03 -->
 <section class="act doorlbl" data-s="0.66" data-e="0.71">
   <div class="plaq">
-  <div class="lbl"><b>WORLD 03</b></div>
-  <div class="lbl">OCT 2026</div>
+  <div class="lbl world03-label"><b>World 03 · The Ice Age</b></div>
+  <div class="lbl world03-label">Open · Enter</div>
+</div>
+</section>
+
+<!-- doors 04-06 — sealed.
+     DATES BELOW ARE PLACEHOLDERS. Edit the four "Dropping on ..." lines
+     (here and in the World 07 plaque) once the schedule is locked. -->
+<section class="act doorlbl" data-s="0.724" data-e="0.746">
+  <div class="plaq">
+  <div class="lbl"><b>World 04 · To Be Revealed</b></div>
+  <div class="lbl">Dropping on 21st Oct</div>
+</div>
+</section>
+
+<section class="act doorlbl" data-s="0.747" data-e="0.769">
+  <div class="plaq">
+  <div class="lbl"><b>World 05 · To Be Revealed</b></div>
+  <div class="lbl">Dropping on 18th Nov</div>
+</div>
+</section>
+
+<section class="act doorlbl" data-s="0.770" data-e="0.792">
+  <div class="plaq">
+  <div class="lbl"><b>World 06 · To Be Revealed</b></div>
+  <div class="lbl">Dropping on 16th Dec</div>
 </div>
 </section>
 
@@ -252,10 +277,10 @@ with hardware acceleration enabled.</p></div>
 <!-- BEAT 12 · door 07 -->
 <section class="act doorlbl" data-s="0.875" data-e="0.925">
   <div class="plaq brass">
-  <div class="lbl"><b>WORLD 07 · THE UNVEILING</b></div>
+  <div class="lbl"><b>World 07 · To Be Revealed</b></div>
   <p class="thesis" style="font-size:clamp(1.6rem,4vw,3rem)">Seven years. Seven worlds.<br>The last one: ours.</p>
-  <p class="story" style="font-size:clamp(1rem,1.4vw,1.2rem)">Unveiled in person —
-  <strong>31 August, at the studio, Bangalore.</strong> An RSVP evening;
+  <p class="story" style="font-size:clamp(1rem,1.4vw,1.2rem)">Dropping on
+  <strong>20th Jan, at the studio, Bangalore.</strong> An RSVP evening;
   the door opens for the first time that night.</p>
   <div class="invite">
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAE3UlEQVR4nO3dQY4cNxJAUcuYi8z4/key5xgCpI0v0BRAg2Fm1n9vKQnV1YkPLkJE5LefP77/Bp/u99tfAP4NQidB6CQInQShkyB0EoROwn9Wf/Hf//3xb36Pf+z/f/355Z/vfv/V56yc+vzp57z7e628vQcnOglCJ0HoJAidBKGTIHQShE7Cco6+cmouu+tpc+tTc/fpzzn1c1fe0oMTnQShkyB0EoROgtBJEDoJQidhe46+cms+PW16Dm3O/Wunvr8TnQShkyB0EoROgtBJEDoJQifh2Bz9aabvbU/fj791f/1TOdFJEDoJQidB6CQInQShkyB0Ej52jn7L9D6Z6b3vn8qJToLQSRA6CUInQegkCJ0EoZNwbI7+lnntrX0jt/bA3Jq7P60HJzoJQidB6CQInQShkyB0EoROwvYc/dQc+pZT8+Zbe2Nu7aVZeUsPTnQShE6C0EkQOglCJ0HoJAidhOUc/Wn3iac97X2c0/P+XW/vwYlOgtBJEDoJQidB6CQInQShk/Dt54/vX/7F9Pspb92fPuUtz+FTn+fuc3OikyB0EoROgtBJEDoJQidB6CQc2+syfV/5aftPpveOv+U5nzL9+U50EoROgtBJEDoJQidB6CQInYTlffSVp91j3nVrTnzrfvmp+f3u95nmPjp8QegkCJ0EoZMgdBKEToLQSdi+j37KW/ZtT8+tp+/Br9ya39/a5+NEJ0HoJAidBKGTIHQShE6C0EnYvo9+yq33X97al7LrLXPuaae+jxOdBKGTIHQShE6C0EkQOglCJ+HYHH16r8hb5sS37ltPz7nfss/HXhfShE6C0EkQOglCJ0HoJAidhOVel+n70Lt2P+fWXP+UW89z9XOn96yvnHoOTnQShE6C0EkQOglCJ0HoJAidhGv70Vem74W/5d78rum5+K7p32uXE50EoZMgdBKEToLQSRA6CUIn4TXvGb01h16Zfp/o9Ofveto+dfvR4QtCJ0HoJAidBKGTIHQShE7Ccj/60+5bv8X0fvTp539rD/r083GikyB0EoROgtBJEDoJQidB6CQs76Pfmn/f2sv+tPd0Tt8vP/Vzn/bvV5zoJAidBKGTIHQShE6C0EkQOgnje12etrdk+nNq9+9Pmf5/Ayc6CUInQegkCJ0EoZMgdBKETsL2XpeV2v6Q3c/f9anPf2V6X74TnQShkyB0EoROgtBJEDoJQidhOUd/u1tz8aftR981/f8Atz7fiU6C0EkQOglCJ0HoJAidBKGTsNzr8rT7yiun9sOs7M5rT82Jb+0RX7n1HtNTz9OJToLQSRA6CUInQegkCJ0EoZOwvR+99v7Rlem977tuvX90+nNOPWcnOglCJ0HoJAidBKGTIHQShE7CsfeM2ivy6z9fedq+l+l5/Kn7/fa6wBeEToLQSRA6CUInQegkCJ2EY3P0p3naPH537n7r3v/K077PLic6CUInQegkCJ0EoZMgdBKETsLHztFXpvdzf+pe+VNuPR8nOglCJ0HoJAidBKGTIHQShE7CsTn62+8rT+/tnn4/6K3vf+r7TO+zd6KTIHQShE6C0EkQOglCJ0HoJGzP0d9y3/rWnPhpz+fWXHya94zCF4ROgtBJEDoJQidB6CQInYRvP398v/0dYJwTnQShkyB0EoROgtBJEDoJQifhb6jtKIKMe7qoAAAAAElFTkSuQmCC" alt="Scan to RSVP for the World 07 unveiling">
@@ -268,17 +293,17 @@ with hardware acceleration enabled.</p></div>
 <section class="act" id="act-footer" data-s="0.94" data-e="1.01">
   <p class="story" style="font-size:clamp(1.2rem,2.4vw,1.8rem)">The worlds stay open. Walk back any time.</p>
   <div class="idx">
-    <!-- DEMO LINKS — restore ./RetroGames/ and ./Y2K/ for production -->
-    <a href="./RetroGames/" target="_blank" rel="noopener"><span>01 · RETRO GAME WORLD</span><span class="st">ENTER →</span></a>
+    <!-- Dates here are placeholders, matching the door plaques above. -->
+    <a href="./RetroGames/" target="_blank" rel="noopener"><span>01 · Retro Games</span><span class="st">ENTER →</span></a>
     <a href="./Y2K/" target="_blank" rel="noopener"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
-    <div class="row next"><span>03</span><span class="st">OCT 2026</span></div>
-    <div class="row"><span>04</span><span class="st">SEALED</span></div>
-    <div class="row"><span>05</span><span class="st">SEALED</span></div>
-    <div class="row"><span>06</span><span class="st">SEALED</span></div>
-    <div class="row w7"><span>07</span><span class="st">31 AUG · BANGALORE · RSVP</span></div>
+    <a href="/iceage" target="_blank" rel="noopener"><span>03 · The Ice Age</span><span class="st">ENTER →</span></a>
+    <div class="row next"><span>04 · To Be Revealed</span><span class="st">21ST OCT</span></div>
+    <div class="row"><span>05 · To Be Revealed</span><span class="st">18TH NOV</span></div>
+    <div class="row"><span>06 · To Be Revealed</span><span class="st">16TH DEC</span></div>
+    <div class="row w7"><span>07 · To Be Revealed</span><span class="st">20TH JAN · BANGALORE · RSVP</span></div>
   </div>
   <div class="passport">
-    <i class="got"></i><i class="got"></i><i></i><i></i><i></i><i></i><i></i>
+    <i class="got"></i><i class="got"></i><i class="got"></i><i></i><i></i><i></i><i></i>
   </div>
   <div class="credit">A HAT! project · Studio How About That! · year seven</div>
 </section>
@@ -854,6 +879,7 @@ const whiteout=document.getElementById('whiteout');
 let target=0, p=0, mx=0, my=0, smx=0, smy=0;
 const w01Labels=document.querySelectorAll('.world01-label');
 const w02Labels=document.querySelectorAll('.world02-label');
+const w03Labels=document.querySelectorAll('.world03-label');
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
   target=h>0?scrollY/h:0;
@@ -861,8 +887,10 @@ addEventListener('scroll',()=>{
      (label section itself runs .365-.425 and .505-.565) */
   const w01Active=target>=.385 && target<=.425;
   const w02Active=target>=.525 && target<=.565;
+  const w03Active=target>=.678 && target<=.710;
   w01Labels.forEach(el=>el.classList.toggle('world01-active',w01Active));
   w02Labels.forEach(el=>el.classList.toggle('world02-active',w02Active));
+  w03Labels.forEach(el=>el.classList.toggle('world03-active',w03Active));
 },{passive:true});
 addEventListener('pointermove',e=>{
   mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2;
