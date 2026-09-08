@@ -691,7 +691,7 @@ function shaftTexture(){
 }
 const shaftTex=shaftTexture();
 const doorFX=[];
-function openDoor(z, side, tex, poolHex, lightHex, href){
+function openDoor(z, side, tex, poolHex, lightHex, href, kind){
   const g=new THREE.Group();
   doorFrame(g);
   /* The cover image IS the door. It is split down the middle into two
@@ -728,16 +728,34 @@ function openDoor(z, side, tex, poolHex, lightHex, href){
   const fl=new THREE.Mesh(fcGeo,dk); fl.position.set(0,.04,-RD/2); fl.rotation.x=-Math.PI/2; g.add(fl);
   const cl=new THREE.Mesh(fcGeo,dk); cl.position.set(0,4.46,-RD/2); cl.rotation.x=Math.PI/2;  g.add(cl);
 
-  /* pieces of the world, adrift in the dark. Only visible once it opens. */
-  const IN=26, ipos=new Float32Array(IN*3), iph=new Float32Array(IN),
-        ir=new Float32Array(IN), idp=new Float32Array(IN);
-  for(let i=0;i<IN;i++){ iph[i]=Math.random()*6.283; ir[i]=.3+Math.random()*.7;
-    idp[i]=.4+Math.random()*(RD-.7); }
-  const igeo=new THREE.BufferGeometry();
-  igeo.setAttribute('position', new THREE.BufferAttribute(ipos,3));
-  const innerMat=new THREE.PointsMaterial({color:lightHex, size:.17, transparent:true,
-    opacity:0, depthWrite:false, blending:THREE.AdditiveBlending});
-  const inner=new THREE.Points(igeo, innerMat); g.add(inner);
+  /* Pieces of the world itself, adrift in the dark — pixel blocks for the
+     retro world, chrome for Y2K, ice shards for the Ice Age. They only
+     surface as the picture parts. */
+  const debris=[];
+  const PIX=[0x4d5dff,0xffed4e,0xff3b4e,0x35e07a,0xf5f7ff];
+  for(let i=0;i<15;i++){
+    let m;
+    if(kind==='pixel'){
+      const sz=.11+Math.random()*.15;
+      m=new THREE.Mesh(new THREE.BoxGeometry(sz,sz,sz),
+        new THREE.MeshBasicMaterial({color:PIX[i%PIX.length], transparent:true, opacity:0}));
+    } else if(kind==='chrome'){
+      m=new THREE.Mesh(new THREE.SphereGeometry(.07+Math.random()*.10,16,12),
+        new THREE.MeshStandardMaterial({color:0xe4e9f0, metalness:1, roughness:.15,
+          transparent:true, opacity:0}));
+    } else {                                   /* ice shards */
+      m=new THREE.Mesh(new THREE.OctahedronGeometry(.10+Math.random()*.17,0),
+        new THREE.MeshStandardMaterial({color:0xc4e7f5, metalness:.15, roughness:.22,
+          flatShading:true, transparent:true, opacity:0}));
+    }
+    m.userData={ph:Math.random()*6.283, rr:.28+Math.random()*.72,
+      dp:.45+Math.random()*(RD-.9), sp:.5+Math.random(),
+      ax:new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize()};
+    g.add(m); debris.push(m);
+  }
+  /* the chrome and the shards need something in there to catch */
+  const inLight=new THREE.PointLight(lightHex, 0, 7, 2);
+  inLight.position.set(0,2.5,-RD*.45); g.add(inLight);
 
   g.position.set(side*5.95, 0, z);
   g.rotation.y=side>0? -Math.PI/2 : Math.PI/2;
@@ -781,7 +799,7 @@ function openDoor(z, side, tex, poolHex, lightHex, href){
   scene.add(motes);
   const fx={side,z,shaft,shaft2,ring,motes,mg,off,dz,dy,N,
     pivA,pivB,leaks:[leak,leakB],open:DOOR_OPEN,aj:0,
-    inner,innerMat,igeo,IN,iph,ir,idp,RD};
+    debris,inLight,RD};
   doorFX.push(fx);
   return {leak,pl,pool,fx};
 }
@@ -799,9 +817,9 @@ function slabDoor(z, side, num, cracks){
 }
 /* DEMO LINKS — restore './RetroGames/' and './Y2K/' for production */
 const DEMO_L='./RetroGames/', DEMO_R='./Y2K/';
-const d01=openDoor(-76, -1, glimpse01(), 'rgba(33,33,222,.5)', 0x4d5dff, DEMO_L);
-const d02=openDoor(-104,  1, glimpse02(), 'rgba(255,180,84,.55)', 0xffb454, DEMO_R);
-const d03=openDoor(-140, -1, glimpse03(), 'rgba(100,200,220,.55)', 0x64c8dc, '/iceage');
+const d01=openDoor(-76, -1, glimpse01(), 'rgba(33,33,222,.5)', 0x4d5dff, DEMO_L, 'pixel');
+const d02=openDoor(-104,  1, glimpse02(), 'rgba(255,180,84,.55)', 0xffb454, DEMO_R, 'chrome');
+const d03=openDoor(-140, -1, glimpse03(), 'rgba(100,200,220,.55)', 0x64c8dc, '/iceage', 'shard');
 slabDoor(-152,  1, '04', false);
 slabDoor(-157, -1, '05', false);
 slabDoor(-162,  1, '06', false);
@@ -950,17 +968,18 @@ let target=0, p=0, mx=0, my=0, smx=0, smy=0;
 const w01Labels=document.querySelectorAll('.world01-label');
 const w02Labels=document.querySelectorAll('.world02-label');
 const w03Labels=document.querySelectorAll('.world03-label');
+/* A plaque wears its world's colour from the moment it appears until you
+   actually cross that doorway, then drops back to ink. The dolly is
+   z = 8 - 191*(p/.92), so the doors at -76, -104 and -140 are crossed at
+   p = .405, .539 and .713. */
+const WORLD_TINT=[
+  {els:w01Labels, cls:'world01-active', a:.365, b:.405, on:false},
+  {els:w02Labels, cls:'world02-active', a:.505, b:.539, on:false},
+  {els:w03Labels, cls:'world03-active', a:.660, b:.713, on:false},
+];
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
   target=h>0?scrollY/h:0;
-  /* label colour shifts once you are actually at the door
-     (label section itself runs .365-.425 and .505-.565) */
-  const w01Active=target>=.385 && target<=.425;
-  const w02Active=target>=.525 && target<=.565;
-  const w03Active=target>=.678 && target<=.710;
-  w01Labels.forEach(el=>el.classList.toggle('world01-active',w01Active));
-  w02Labels.forEach(el=>el.classList.toggle('world02-active',w02Active));
-  w03Labels.forEach(el=>el.classList.toggle('world03-active',w03Active));
 },{passive:true});
 addEventListener('pointermove',e=>{
   mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2;
@@ -1031,6 +1050,11 @@ function frame(){
   const zj=clamp(p/.92,0,1);
   const z=8 - 191*zj;
   camera.position.set(smx*.5, 2.2 - smy*.25, z);
+  /* plaque wears the world's colour until you pass its door */
+  for(const w of WORLD_TINT){
+    const on = p>=w.a && p<=w.b;
+    if(on!==w.on){ w.on=on; w.els.forEach(e=>e.classList.toggle(w.cls,on)); }
+  }
   camLook.set(smx*1.2, 2.35 - smy*.6, z-9);
   /* turn to face each door as it arrives */
   for(const f of FOCUS){
@@ -1076,17 +1100,17 @@ function frame(){
     const a=f.open * f.aj;
     f.pivA.rotation.y=a; f.pivB.rotation.y=-a;      /* inward, into the recess */
     /* the alley behind only exists once the picture opens */
-    f.innerMat.opacity=.9*f.aj;
-    if(f.aj>.008){
-      const ia=f.igeo.attributes.position.array;
-      for(let i=0;i<f.IN;i++){
-        const ph=f.iph[i];
-        ia[i*3]   = Math.sin(t*.34+ph)*f.ir[i];
-        ia[i*3+1] = 2.25 + Math.cos(t*.26+ph*1.7)*1.6;
-        ia[i*3+2] = -f.idp[i] + Math.sin(t*.21+ph)*.3;
+    f.inLight.intensity=7*f.aj;
+    if(f.aj>.006){
+      for(const m of f.debris){
+        const u=m.userData;
+        m.position.set(Math.sin(t*.33+u.ph)*u.rr,
+                       2.25 + Math.cos(t*.25+u.ph*1.7)*1.55,
+                       -u.dp + Math.sin(t*.2+u.ph)*.3);
+        m.rotateOnAxis(u.ax, .007*u.sp);
+        m.material.opacity=.96*f.aj;
       }
-      f.igeo.attributes.position.needsUpdate=true;
-    }
+    } else for(const m of f.debris) m.material.opacity=0;
     /* more gap, more spill */
     f.shaft.material.opacity=(.26+.08*Math.sin(t*1.4+f.z)) * (1+.9*f.aj);
     f.shaft2.material.opacity=.16*(1+.9*f.aj);
