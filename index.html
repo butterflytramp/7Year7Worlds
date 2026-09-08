@@ -62,6 +62,7 @@
   /* custom cursors on door hover */
   body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}
   body.cur-w02{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.45' stop-color='%23c8ccd4'/%3E%3Cstop offset='1' stop-color='%235a616e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='18' cy='18' r='13' fill='url(%23g)'/%3E%3Cellipse cx='13' cy='12' rx='4' ry='2.6' fill='%23ffffff' opacity='0.85'/%3E%3C/svg%3E") 18 18, pointer}
+  body.cur-w03{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cdefs%3E%3ClinearGradient id='tk' x1='10%25' y1='0%25' x2='90%25' y2='100%25'%3E%3Cstop offset='0' stop-color='%23fffef9'/%3E%3Cstop offset='.45' stop-color='%23f0e5cc'/%3E%3Cstop offset='1' stop-color='%23c2a97e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M10 33.5 C2 23.5 3.5 9 16 3.6 C26.6 -1 35 4 35.4 11.6 C32 6.6 25.5 6.2 20 10.4 C11.8 16.6 11.4 25.4 15.2 33 Z' fill='url(%23tk)' stroke='%230b2447' stroke-width='1.15' stroke-linejoin='round'/%3E%3Cpath d='M17.5 12.5 C13.5 17.5 13.2 24 15.4 29.5' fill='none' stroke='%23fffdf4' stroke-width='1.1' opacity='.55' stroke-linecap='round'/%3E%3C/svg%3E") 18 18, pointer}
 
   /* door labels sit lower, near the door */
   .act.doorlbl{justify-content:flex-end;padding-bottom:12vh;gap:.7rem}
@@ -996,11 +997,11 @@ addEventListener('pointermove',e=>{
   hovered = hit ? hit.object : null;
 
   const cl=document.body.classList;
-  cl.remove('cur-w01','cur-w02');
+  cl.remove('cur-w01','cur-w02','cur-w03');
   document.body.style.cursor='';
   if(hovered && hovered.userData.kind==='door'){
     const h=(hovered.userData.href||'').toLowerCase();
-    cl.add(h.includes('retro')?'cur-w01':'cur-w02');
+    cl.add(h.includes('retro') ? 'cur-w01' : h.includes('ice') ? 'cur-w03' : 'cur-w02');
   } else if(hovered && hovered.userData.kind==='door7'){
     document.body.style.cursor='pointer';
   }
