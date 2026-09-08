@@ -968,14 +968,16 @@ let target=0, p=0, mx=0, my=0, smx=0, smy=0;
 const w01Labels=document.querySelectorAll('.world01-label');
 const w02Labels=document.querySelectorAll('.world02-label');
 const w03Labels=document.querySelectorAll('.world03-label');
-/* A plaque wears its world's colour from the moment it appears until you
-   actually cross that doorway, then drops back to ink. The dolly is
-   z = 8 - 191*(p/.92), so the doors at -76, -104 and -140 are crossed at
-   p = .405, .539 and .713. */
+/* A plaque wears its world's colour for the whole time it is on screen.
+   The window opens .02 before the plaque fades in, so the .6s colour
+   transition on .lbl has finished by the time you can read it, and closes
+   with the plaque itself — an earlier version stopped at the doorway
+   crossing, which left the plaque sitting in ink for the rest of its life.
+   Section ranges: .365-.425, .505-.565, .66-.71. */
 const WORLD_TINT=[
-  {els:w01Labels, cls:'world01-active', a:.365, b:.405, on:false},
-  {els:w02Labels, cls:'world02-active', a:.505, b:.539, on:false},
-  {els:w03Labels, cls:'world03-active', a:.660, b:.713, on:false},
+  {els:w01Labels, cls:'world01-active', a:.345, b:.428, on:false},
+  {els:w02Labels, cls:'world02-active', a:.485, b:.568, on:false},
+  {els:w03Labels, cls:'world03-active', a:.640, b:.714, on:false},
 ];
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
