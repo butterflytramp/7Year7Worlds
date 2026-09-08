@@ -53,8 +53,12 @@
 
   /* dynamic label colors */
   .lbl.world-active{transition:color .6s ease}
-  .lbl.world01-active{color:#0066ff}
-  .lbl.world02-active{color:#ff3366}
+  .lbl.world01-active{color:#0066ff !important}
+  .lbl.world02-active{color:#ff3366 !important}
+
+  /* custom cursors */
+  .door01{cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="%23ffed4e"/><polygon points="20,12 28,16 20,20" fill="%23ffed4e"/></svg>') 16 16, auto}
+  .door02{cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23c0c0c0"/><circle cx="16" cy="16" r="8" fill="%23e8e8e8"/></svg>') 16 16, auto}
 
   /* door labels sit lower, near the door */
   .act.doorlbl{justify-content:flex-end;padding-bottom:12vh;gap:.7rem}
@@ -957,9 +961,9 @@ const w02Labels=document.querySelectorAll('.world02-label');
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
   target=h>0?scrollY/h:0;
-  /* label color change when near room */
-  const w01Active=target>=.28 && target<=.34;
-  const w02Active=target>=.54 && target<=.60;
+  /* label color change when viewing room */
+  const w01Active=target>=.22 && target<=.35;
+  const w02Active=target>=.505 && target<=.60;
   w01Labels.forEach(el=>el.classList.toggle('world01-active',w01Active));
   w02Labels.forEach(el=>el.classList.toggle('world02-active',w02Active));
 },{passive:true});
@@ -968,8 +972,13 @@ addEventListener('pointermove',e=>{
   ray.setFromCamera({x:mx,y:-my}, camera);
   const hit=ray.intersectObjects(clickables,false)[0];
   hovered = hit ? hit.object : null;
-  document.body.style.cursor =
-    (hovered && (hovered.userData.kind==='door'||hovered.userData.kind==='door7')) ? 'pointer' : '';
+
+  if(hovered && (hovered.userData.kind==='door'||hovered.userData.kind==='door7')){
+    const doorNum=hovered.userData.href?.includes('retro')?'01':'02';
+    document.body.style.cursor=doorNum==='01'?'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2212%22 fill=%22%23ffed4e%22/><polygon points=%2220,12 28,16 20,20%22 fill=%22%23ffed4e%22/></svg>") 16 16, auto':'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2210%22 fill=%22%23c0c0c0%22/><circle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22%23e8e8e8%22/></svg>") 16 16, auto';
+  } else {
+    document.body.style.cursor='';
+  }
 },{passive:true});
 addEventListener('resize',()=>{
   camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
@@ -984,7 +993,7 @@ addEventListener('click',e=>{
   const hit=ray.intersectObjects(clickables,false)[0];
   if(!hit) return;
   const u=hit.object.userData;
-  if(u.kind==='door') location.href=u.href;
+  if(u.kind==='door') window.open(u.href,'_blank');
   else if(u.kind==='door7'){
     knockT=clock3.elapsedTime;
     soon.style.left=(e.clientX+14)+'px'; soon.style.top=(e.clientY-10)+'px';
