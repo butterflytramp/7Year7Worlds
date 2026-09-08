@@ -51,14 +51,14 @@
   .act .lbl b{color:#ffffff;font-weight:600;text-shadow:0 0 14px rgba(0,0,0,.9)}
 
 
-  /* dynamic label colors */
-  .lbl.world-active{transition:color .6s ease}
-  .lbl.world01-active{color:#0066ff !important}
-  .lbl.world02-active{color:#ff3366 !important}
+  /* dynamic label colours — override the white .act .lbl rules */
+  .lbl{transition:color .6s ease}
+  .lbl.world01-active,.lbl.world01-active b{color:#0066ff !important}
+  .lbl.world02-active,.lbl.world02-active b{color:#ff3366 !important}
 
-  /* custom cursors */
-  .door01{cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="%23ffed4e"/><polygon points="20,12 28,16 20,20" fill="%23ffed4e"/></svg>') 16 16, auto}
-  .door02{cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23c0c0c0"/><circle cx="16" cy="16" r="8" fill="%23e8e8e8"/></svg>') 16 16, auto}
+  /* custom cursors on door hover */
+  body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}
+  body.cur-w02{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.45' stop-color='%23c8ccd4'/%3E%3Cstop offset='1' stop-color='%235a616e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='18' cy='18' r='13' fill='url(%23g)'/%3E%3Cellipse cx='13' cy='12' rx='4' ry='2.6' fill='%23ffffff' opacity='0.85'/%3E%3C/svg%3E") 18 18, pointer}
 
   /* door labels sit lower, near the door */
   .act.doorlbl{justify-content:flex-end;padding-bottom:12vh;gap:.7rem}
@@ -333,8 +333,8 @@ with hardware acceleration enabled.</p></div>
   <p class="story" style="font-size:clamp(1.2rem,2.4vw,1.8rem)">The worlds stay open. Walk back any time.</p>
   <div class="idx">
     <!-- DEMO LINKS — restore ./RetroGames/ and ./Y2K/ for production -->
-    <a href="./RetroGames/"><span>01 · RETRO GAME WORLD</span><span class="st">ENTER →</span></a>
-    <a href="./Y2K/"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
+    <a href="./RetroGames/" target="_blank" rel="noopener"><span>01 · RETRO GAME WORLD</span><span class="st">ENTER →</span></a>
+    <a href="./Y2K/" target="_blank" rel="noopener"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
     <div class="row next"><span>03</span><span class="st">OCT 2026</span></div>
     <div class="row"><span>04</span><span class="st">SEALED</span></div>
     <div class="row"><span>05</span><span class="st">SEALED</span></div>
@@ -961,9 +961,10 @@ const w02Labels=document.querySelectorAll('.world02-label');
 addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-innerHeight;
   target=h>0?scrollY/h:0;
-  /* label color change when viewing room */
-  const w01Active=target>=.22 && target<=.35;
-  const w02Active=target>=.505 && target<=.60;
+  /* label colour shifts once you are actually at the door
+     (label section itself runs .365-.425 and .505-.565) */
+  const w01Active=target>=.385 && target<=.425;
+  const w02Active=target>=.525 && target<=.565;
   w01Labels.forEach(el=>el.classList.toggle('world01-active',w01Active));
   w02Labels.forEach(el=>el.classList.toggle('world02-active',w02Active));
 },{passive:true});
@@ -973,11 +974,14 @@ addEventListener('pointermove',e=>{
   const hit=ray.intersectObjects(clickables,false)[0];
   hovered = hit ? hit.object : null;
 
-  if(hovered && (hovered.userData.kind==='door'||hovered.userData.kind==='door7')){
-    const doorNum=hovered.userData.href?.includes('retro')?'01':'02';
-    document.body.style.cursor=doorNum==='01'?'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2212%22 fill=%22%23ffed4e%22/><polygon points=%2220,12 28,16 20,20%22 fill=%22%23ffed4e%22/></svg>") 16 16, auto':'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2210%22 fill=%22%23c0c0c0%22/><circle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22%23e8e8e8%22/></svg>") 16 16, auto';
-  } else {
-    document.body.style.cursor='';
+  const cl=document.body.classList;
+  cl.remove('cur-w01','cur-w02');
+  document.body.style.cursor='';
+  if(hovered && hovered.userData.kind==='door'){
+    const h=(hovered.userData.href||'').toLowerCase();
+    cl.add(h.includes('retro')?'cur-w01':'cur-w02');
+  } else if(hovered && hovered.userData.kind==='door7'){
+    document.body.style.cursor='pointer';
   }
 },{passive:true});
 addEventListener('resize',()=>{
