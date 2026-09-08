@@ -671,6 +671,20 @@ function openDoor(z, side, tex, poolHex, lightHex, href){
   leak.position.set(0,2.25,.02); g.add(leak);
   leak.userData={href, kind:'door'};
   clickables.push(leak);
+  /* Two leaves, hinged on their jambs and standing ajar, so the world is
+     always spilling through the gap between them. Walk up and hover and they
+     swing wider. They sit proud of the jamb depth (z .18) so they never clip
+     it, and they are not clickable — the ray still reaches the glimpse behind. */
+  const LEAF_REST=1.05, LEAF_OPEN=1.47;   /* 60deg ajar -> 84deg on approach */
+  const leafMat=new THREE.MeshStandardMaterial({color:0x102a4e, roughness:.42,
+    metalness:.18, envMapIntensity:.5});
+  const leafGeo=new THREE.BoxGeometry(1.10,4.34,.06);
+  const pivL=new THREE.Group(), pivR=new THREE.Group();
+  pivL.position.set(-1.18,2.25,.18); pivR.position.set(1.18,2.25,.18);
+  const lfL=new THREE.Mesh(leafGeo,leafMat); lfL.position.set(.55,0,0); pivL.add(lfL);
+  const lfR=new THREE.Mesh(leafGeo,leafMat); lfR.position.set(-.55,0,0); pivR.add(lfR);
+  pivL.rotation.y=-LEAF_REST; pivR.rotation.y=LEAF_REST;
+  g.add(pivL); g.add(pivR);
   g.position.set(side*5.95, 0, z);
   g.rotation.y=side>0? -Math.PI/2 : Math.PI/2;
   scene.add(g);
@@ -711,7 +725,8 @@ function openDoor(z, side, tex, poolHex, lightHex, href){
     size:.09, transparent:true, opacity:.85, depthWrite:false,
     blending:THREE.AdditiveBlending}));
   scene.add(motes);
-  const fx={side,z,shaft,shaft2,ring,motes,mg,off,dz,dy,N};
+  const fx={side,z,shaft,shaft2,ring,motes,mg,off,dz,dy,N,
+    pivL,pivR,leak,rest:LEAF_REST,open:LEAF_OPEN,aj:0};
   doorFX.push(fx);
   return {leak,pl,pool,fx};
 }
@@ -999,7 +1014,15 @@ function frame(){
   d01.pool.material.opacity=.65+.15*Math.sin(t*1.1);
   d02.pool.material.opacity=.65+.15*Math.sin(t*.9+1);
   for(const f of doorFX){
-    f.shaft.material.opacity=.26+.08*Math.sin(t*1.4+f.z);
+    /* open only when you are actually near the door and pointing at it */
+    const near=Math.abs(camera.position.z - f.z) < 13;
+    const want=(hovered===f.leak && near) ? 1 : 0;
+    f.aj += (want - f.aj) * .085;
+    const a=f.rest + (f.open - f.rest) * f.aj;
+    f.pivL.rotation.y=-a; f.pivR.rotation.y=a;
+    /* more gap, more spill */
+    f.shaft.material.opacity=(.26+.08*Math.sin(t*1.4+f.z)) * (1+.9*f.aj);
+    f.shaft2.material.opacity=.16*(1+.9*f.aj);
     f.ring.material.opacity=.3+.3*(.5+.5*Math.sin(t*2.2+f.z));
     const rs=1+.18*(.5+.5*Math.sin(t*2.2+f.z));
     f.ring.scale.set(rs,rs,1);
