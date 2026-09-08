@@ -452,14 +452,42 @@ function wallTexture(base){
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
   t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
 }
-const wtL=wallTexture('#f2ecdf'); wtL.repeat.set(12,1);
-const wallL=new THREE.Mesh(new THREE.PlaneGeometry(320,18),
-  corrMat(0xffffff,{map:wtL}));
-wallL.rotation.y=Math.PI/2; wallL.position.set(-6,9,-90); scene.add(wallL);
-const wtR=wallTexture('#f0eadd'); wtR.repeat.set(12,1);
-const wallR=new THREE.Mesh(new THREE.PlaneGeometry(220,18),
-  corrMat(0xffffff,{map:wtR}));
-wallR.rotation.y=-Math.PI/2; wallR.position.set(6,9,-90); scene.add(wallR);
+/* Walls are built in segments with a gap at each open doorway. They used to
+   be one unbroken plane, which sat in front of the door recesses and hid
+   them — the doors open into the wall, so the wall needs a hole to open into. */
+function buildWall(x, zFrom, zTo, gaps, tex, perUnit, rotY){
+  const segs=[]; let cur=zFrom;
+  for(const [ga,gb] of gaps.sort((a,b)=>a[0]-b[0])){
+    if(ga>cur) segs.push([cur,ga]);
+    cur=Math.max(cur,gb);
+  }
+  if(cur<zTo) segs.push([cur,zTo]);
+  /* the opening is only as tall as the doorway — wall it back in above */
+  const HEAD=4.72, WH=18;
+  for(const [ga,gb] of gaps){
+    const len=gb-ga, h=WH-HEAD;
+    const tx=tex.clone(); tx.needsUpdate=true;
+    tx.wrapS=tx.wrapT=THREE.RepeatWrapping;
+    tx.repeat.set(len*perUnit, h/WH);
+    const lint=new THREE.Mesh(new THREE.PlaneGeometry(len,h), corrMat(0xffffff,{map:tx}));
+    lint.rotation.y=rotY; lint.position.set(x, HEAD+h/2, (ga+gb)/2); scene.add(lint);
+  }
+  for(const [a,b] of segs){
+    const len=b-a; if(len<=0.01) continue;
+    /* clone the plaster per segment so its scale matches the run it covers */
+    const tx=tex.clone(); tx.needsUpdate=true;
+    tx.wrapS=tx.wrapT=THREE.RepeatWrapping;
+    tx.repeat.set(len*perUnit, 1);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(len,18), corrMat(0xffffff,{map:tx}));
+    m.rotation.y=rotY; m.position.set(x, 9, (a+b)/2); scene.add(m);
+  }
+}
+const DOOR_W=2.44;                       /* the opening each doorway needs */
+const gapAt=z=>[z-DOOR_W/2, z+DOOR_W/2];
+const wtL=wallTexture('#f2ecdf');
+buildWall(-6, -250, 70, [gapAt(-76), gapAt(-140)], wtL, 12/320, Math.PI/2);
+const wtR=wallTexture('#f0eadd');
+buildWall(6, -200, 20, [gapAt(-104)], wtR, 12/220, -Math.PI/2);
 const wtE=wallTexture('#ece5d6'); wtE.repeat.set(2,1.5);
 const endWall=new THREE.Mesh(new THREE.PlaneGeometry(24,18),
   corrMat(0xffffff,{map:wtE}));
@@ -666,25 +694,51 @@ const doorFX=[];
 function openDoor(z, side, tex, poolHex, lightHex, href){
   const g=new THREE.Group();
   doorFrame(g);
-  const leak=new THREE.Mesh(new THREE.PlaneGeometry(2.4,4.4),
-    new THREE.MeshBasicMaterial({map:tex}));
-  leak.position.set(0,2.25,.02); g.add(leak);
+  /* The cover image IS the door. It is split down the middle into two
+     panels, each UV-mapped to its half so they read as one picture when
+     shut, each hinged on its own jamb. They swing inward, into a recess
+     behind the wall. */
+  const DOOR_OPEN=.95;                       /* ~54deg */
+  function halfPanel(u0,u1){
+    const gm=new THREE.PlaneGeometry(1.2,4.4);
+    const uv=gm.attributes.uv;
+    for(let i=0;i<uv.count;i++) uv.setX(i, u0+(u1-u0)*uv.getX(i));
+    uv.needsUpdate=true; return gm;
+  }
+  const panelMat=new THREE.MeshBasicMaterial({map:tex});
+  const pivA=new THREE.Group(), pivB=new THREE.Group();
+  pivA.position.set(-1.2,2.25,.02); pivB.position.set(1.2,2.25,.02);
+  const leak =new THREE.Mesh(halfPanel(0,.5),  panelMat); leak.position.set(.6,0,0);  pivA.add(leak);
+  const leakB=new THREE.Mesh(halfPanel(.5,1),  panelMat); leakB.position.set(-.6,0,0); pivB.add(leakB);
+  g.add(pivA); g.add(pivB);
   leak.userData={href, kind:'door'};
-  clickables.push(leak);
-  /* Two leaves, hinged on their jambs and standing ajar, so the world is
-     always spilling through the gap between them. Walk up and hover and they
-     swing wider. They sit proud of the jamb depth (z .18) so they never clip
-     it, and they are not clickable — the ray still reaches the glimpse behind. */
-  const LEAF_REST=1.05, LEAF_OPEN=1.47;   /* 60deg ajar -> 84deg on approach */
-  const leafMat=new THREE.MeshStandardMaterial({color:0x102a4e, roughness:.42,
-    metalness:.18, envMapIntensity:.5});
-  const leafGeo=new THREE.BoxGeometry(1.10,4.34,.06);
-  const pivL=new THREE.Group(), pivR=new THREE.Group();
-  pivL.position.set(-1.18,2.25,.18); pivR.position.set(1.18,2.25,.18);
-  const lfL=new THREE.Mesh(leafGeo,leafMat); lfL.position.set(.55,0,0); pivL.add(lfL);
-  const lfR=new THREE.Mesh(leafGeo,leafMat); lfR.position.set(-.55,0,0); pivR.add(lfR);
-  pivL.rotation.y=-LEAF_REST; pivR.rotation.y=LEAF_REST;
-  g.add(pivL); g.add(pivR);
+  leakB.userData={href, kind:'door'};
+  clickables.push(leak, leakB);
+
+  /* the recess the doors open onto — a dark alley cut into the wall */
+  const RD=2.7;
+  const dk=new THREE.MeshBasicMaterial({color:0x050c15, side:THREE.DoubleSide});
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(2.4,4.4),
+    new THREE.MeshBasicMaterial({color:0x08131f}));
+  back.position.set(0,2.25,-RD); g.add(back);
+  const swGeo=new THREE.PlaneGeometry(RD,4.4);
+  const wA=new THREE.Mesh(swGeo,dk); wA.position.set(-1.2,2.25,-RD/2); wA.rotation.y=Math.PI/2; g.add(wA);
+  const wB=new THREE.Mesh(swGeo,dk); wB.position.set(1.2,2.25,-RD/2);  wB.rotation.y=-Math.PI/2; g.add(wB);
+  const fcGeo=new THREE.PlaneGeometry(2.4,RD);
+  const fl=new THREE.Mesh(fcGeo,dk); fl.position.set(0,.04,-RD/2); fl.rotation.x=-Math.PI/2; g.add(fl);
+  const cl=new THREE.Mesh(fcGeo,dk); cl.position.set(0,4.46,-RD/2); cl.rotation.x=Math.PI/2;  g.add(cl);
+
+  /* pieces of the world, adrift in the dark. Only visible once it opens. */
+  const IN=26, ipos=new Float32Array(IN*3), iph=new Float32Array(IN),
+        ir=new Float32Array(IN), idp=new Float32Array(IN);
+  for(let i=0;i<IN;i++){ iph[i]=Math.random()*6.283; ir[i]=.3+Math.random()*.7;
+    idp[i]=.4+Math.random()*(RD-.7); }
+  const igeo=new THREE.BufferGeometry();
+  igeo.setAttribute('position', new THREE.BufferAttribute(ipos,3));
+  const innerMat=new THREE.PointsMaterial({color:lightHex, size:.17, transparent:true,
+    opacity:0, depthWrite:false, blending:THREE.AdditiveBlending});
+  const inner=new THREE.Points(igeo, innerMat); g.add(inner);
+
   g.position.set(side*5.95, 0, z);
   g.rotation.y=side>0? -Math.PI/2 : Math.PI/2;
   scene.add(g);
@@ -726,7 +780,8 @@ function openDoor(z, side, tex, poolHex, lightHex, href){
     blending:THREE.AdditiveBlending}));
   scene.add(motes);
   const fx={side,z,shaft,shaft2,ring,motes,mg,off,dz,dy,N,
-    pivL,pivR,leak,rest:LEAF_REST,open:LEAF_OPEN,aj:0};
+    pivA,pivB,leaks:[leak,leakB],open:DOOR_OPEN,aj:0,
+    inner,innerMat,igeo,IN,iph,ir,idp,RD};
   doorFX.push(fx);
   return {leak,pl,pool,fx};
 }
@@ -1014,12 +1069,24 @@ function frame(){
   d01.pool.material.opacity=.65+.15*Math.sin(t*1.1);
   d02.pool.material.opacity=.65+.15*Math.sin(t*.9+1);
   for(const f of doorFX){
-    /* open only when you are actually near the door and pointing at it */
+    /* the picture parts only when you are near the door and pointing at it */
     const near=Math.abs(camera.position.z - f.z) < 13;
-    const want=(hovered===f.leak && near) ? 1 : 0;
-    f.aj += (want - f.aj) * .085;
-    const a=f.rest + (f.open - f.rest) * f.aj;
-    f.pivL.rotation.y=-a; f.pivR.rotation.y=a;
+    const want=(f.leaks.indexOf(hovered)>=0 && near) ? 1 : 0;
+    f.aj += (want - f.aj) * .075;
+    const a=f.open * f.aj;
+    f.pivA.rotation.y=a; f.pivB.rotation.y=-a;      /* inward, into the recess */
+    /* the alley behind only exists once the picture opens */
+    f.innerMat.opacity=.9*f.aj;
+    if(f.aj>.008){
+      const ia=f.igeo.attributes.position.array;
+      for(let i=0;i<f.IN;i++){
+        const ph=f.iph[i];
+        ia[i*3]   = Math.sin(t*.34+ph)*f.ir[i];
+        ia[i*3+1] = 2.25 + Math.cos(t*.26+ph*1.7)*1.6;
+        ia[i*3+2] = -f.idp[i] + Math.sin(t*.21+ph)*.3;
+      }
+      f.igeo.attributes.position.needsUpdate=true;
+    }
     /* more gap, more spill */
     f.shaft.material.opacity=(.26+.08*Math.sin(t*1.4+f.z)) * (1+.9*f.aj);
     f.shaft2.material.opacity=.16*(1+.9*f.aj);
