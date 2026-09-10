@@ -206,22 +206,21 @@
     animation:ov-flick 11s ease-in-out infinite}
 
   /* --- the painting, under an arch --- */
-  .ov-arch{position:absolute;left:5.2vw;right:5.2vw;top:4.4vh;bottom:-2vh;
-    border-radius:50% 50% 0 0 / 35% 35% 0 0;
+  .ov-arch{position:absolute;left:5.15vw;right:5.15vw;top:4.45vh;bottom:-2vh;
+    border-radius:47% 47% 0 0 / 27% 27% 0 0;
     background:url('/art/overture/fresco.webp') center/cover;
-    box-shadow:inset 0 -120px 150px -50px var(--void);
+    box-shadow:inset 0 -170px 200px -30px var(--void);
     opacity:0;transform:scale(1.05);
     transform-origin:50% 44%;
     transition:opacity 2.2s ease,transform 2.6s cubic-bezier(.16,.72,.2,1)}
-  .ov-archv{position:absolute;left:5.2vw;right:5.2vw;top:4.4vh;bottom:-2vh;
-    border-radius:50% 50% 0 0 / 35% 35% 0 0;pointer-events:none;
+  .ov-archv{position:absolute;left:5.15vw;right:5.15vw;top:4.45vh;bottom:-2vh;
+    border-radius:47% 47% 0 0 / 27% 27% 0 0;pointer-events:none;
     background:radial-gradient(ellipse 74% 66% at 50% 42%,
-      rgba(6,5,10,0) 40%,rgba(6,5,10,.34) 72%,rgba(6,5,10,.8) 100%)}
+      rgba(6,5,10,0) 34%,rgba(6,5,10,.42) 70%,rgba(6,5,10,.78) 92%)}
   #overture.lit .ov-arch{opacity:1;transform:
     scale(1.005) translate3d(calc(var(--px)*-9px),calc(var(--py)*-7px),0)}
 
-  /* --- the numeral: burnt orange, with the painting showing faintly
-         through it so it reads as pigment rather than vector fill --- */
+  /* --- the numeral: one flat burnt orange, laid over the painting --- */
   .ov-stage{position:absolute;inset:0;display:grid;place-items:center;
     filter:drop-shadow(0 24px 80px rgba(6,5,10,.85))}
   .ov-seven{
@@ -229,22 +228,12 @@
     font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 1;
     font-weight:700;font-size:var(--sev,42vh);line-height:1;
     letter-spacing:0;user-select:none;grid-area:1/1;text-align:center;
-    background-image:
-      linear-gradient(rgba(240,138,37,.955),rgba(233,119,28,.955)),
-      url('/art/overture/fresco.webp');
-    background-size:cover,auto 150%;
-    background-position:center,
-      calc(46% + var(--px)*2.4%) calc(30% + var(--py)*2.4%);
-    -webkit-background-clip:text;background-clip:text;
-    color:transparent;-webkit-text-fill-color:transparent;
-    opacity:0;transform:translateY(calc(var(--dy,0px) + 4.5vh)) scale(1.05);
+    color:var(--orange);
+    opacity:0;transform:translateY(var(--dy,0px)) scale(1.05);
     transition:opacity 1.7s cubic-bezier(.2,.7,.25,1) .75s,
                transform 2.3s cubic-bezier(.16,.72,.2,1) .75s}
   #overture.lit .ov-seven{opacity:1;
-    transform:translateY(calc(var(--dy,0px) + 4.5vh)) scale(1)}
-  @supports not ((-webkit-background-clip:text) or (background-clip:text)){
-    .ov-seven{background:none;color:var(--orange);-webkit-text-fill-color:var(--orange)}
-  }
+    transform:translateY(var(--dy,0px)) scale(1)}
 
   .ov-chrome{position:absolute;inset:0;pointer-events:none;z-index:0;isolation:isolate}
   #overture.driving .ov-arch,#overture.driving .ov-stage,
@@ -255,14 +244,14 @@
     text-transform:uppercase;color:var(--orange);
     opacity:0;transition:opacity 1.2s ease 2.1s}
   #overture.lit .ov-mark{opacity:.92}
-  .ov-kick{top:2.4vh;left:0;right:0;text-align:center;
-    font-size:.72rem;letter-spacing:.5em}
-  .ov-rail{top:50%;font-size:.72rem;letter-spacing:.42em;writing-mode:vertical-rl}
-  .ov-rl{left:1.9vw;transform:translateY(-50%) rotate(180deg)}
-  .ov-rr{right:1.9vw;transform:translateY(-50%)}
-  .ov-star{font-size:1.5rem;line-height:1;letter-spacing:0}
-  .ov-s1{left:1.6vw;top:16vh} .ov-s2{right:1.6vw;top:16vh}
-  .ov-seal{position:absolute;right:6.6vw;top:2.6vh;width:112px;height:78px;
+  .ov-kick{top:2.2vh;left:0;right:0;text-align:center;
+    font-size:.81rem;letter-spacing:.5em}
+  .ov-rail{top:50%;font-size:.87rem;letter-spacing:.42em;writing-mode:vertical-rl}
+  .ov-rl{left:1.8vw;transform:translateY(-50%) rotate(180deg)}
+  .ov-rr{right:1.8vw;transform:translateY(-50%)}
+  .ov-star{font-size:1.63rem;line-height:1;letter-spacing:0}
+  .ov-s1{left:1.5vw;top:16.7vh} .ov-s2{right:1.5vw;top:16.7vh}
+  .ov-seal{position:absolute;right:7.2vw;top:2.9vh;width:112px;height:78px;
     opacity:0;transition:opacity 1.2s ease 2.25s}
   #overture.lit .ov-seal{opacity:.92}
   .ov-seal text{font-family:'IBM Plex Mono',ui-monospace,monospace;
@@ -277,20 +266,20 @@
     font-size:clamp(1.2rem,3.1vw,3rem);line-height:1;white-space:nowrap;
     text-shadow:0 3px 26px rgba(6,5,10,.95),0 0 60px rgba(6,5,10,.75);
     opacity:0;transition:opacity 1.1s ease,transform 1.5s cubic-bezier(.16,.7,.2,1)}
-  .ov-years {left:8.5vw; bottom:26vh; transform:translateX(-46px)}
-  .ov-worlds{right:8.5vw; top:23vh;  transform:translateX(46px)}
+  .ov-years {left:8.75vw; bottom:26.4vh; transform:translateX(-46px)}
+  .ov-worlds{right:8.75vw; top:23.8vh;  transform:translateX(46px)}
   #overture.lit .ov-word{opacity:1;transform:none}
   #overture.lit .ov-years {transition-delay:1.55s}
   #overture.lit .ov-worlds{transition-delay:1.75s}
 
   /* --- the ode, and the way in --- */
-  .ov-ode{position:absolute;left:0;right:0;bottom:10vh;text-align:center;
+  .ov-ode{position:absolute;left:0;right:0;bottom:10.2vh;text-align:center;
     padding:0 8vw;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;
     font-size:clamp(1.15rem,2.3vw,2.1rem);line-height:1.35;color:var(--ivory);
     text-shadow:0 3px 30px rgba(6,5,10,.98);
     opacity:0;transition:opacity 1.4s ease 2.35s}
   #overture.lit .ov-ode{opacity:.94}
-  .ov-foot{position:absolute;left:0;right:0;bottom:4vh;display:flex;
+  .ov-foot{position:absolute;left:0;right:0;bottom:4.7vh;display:flex;
     flex-direction:column;align-items:center;text-align:center;padding:0 6vw}
   .ov-foot::before{content:'';position:absolute;left:50%;bottom:-8vh;
     width:min(900px,94vw);height:30vh;transform:translateX(-50%);z-index:-1;
@@ -313,8 +302,8 @@
 
   /* --- material: edge darkening, paper, grain, a slow flicker --- */
   .ov-vig{position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(ellipse 98% 92% at 50% 46%,
-      rgba(6,5,10,0) 46%,rgba(6,5,10,.5) 80%,rgba(3,3,5,.95) 100%)}
+    background:radial-gradient(ellipse 104% 98% at 50% 46%,
+      rgba(6,5,10,0) 62%,rgba(6,5,10,.22) 86%,rgba(3,3,5,.6) 100%)}
   .ov-paper{position:absolute;inset:0;pointer-events:none;opacity:.05;
     mix-blend-mode:overlay;
     background-image:repeating-linear-gradient(97deg,rgba(255,255,255,.5) 0 1px,transparent 1px 3px),
@@ -436,28 +425,70 @@ const quiet    = matchMedia('(prefers-reduced-motion:reduce)');
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const S=(a,b,v)=>{const t=cl((v-a)/(b-a),0,1);return t*t*(3-2*t)};
 
-/* --- size the 7 from its own measured ink, not from a font-size guess, so
-       the composition survives a font swap or a fallback serif --- */
+/* --- size the 7 from its own measured ink. Font tables lie often enough
+       (old-style figures, a fallback that is not the face you asked for)
+       that the glyph is rasterised once and the ink box read off the
+       pixels, so the composition holds whatever font actually resolves. */
+const FIT={h:.80, cy:.544};      /* ink height, and where its middle sits */
+function inkOf(cs){
+  const P=140, S=3, c=document.createElement('canvas');
+  c.width=c.height=P*S;
+  const x=c.getContext('2d');
+  x.font=cs.fontWeight+' '+(P*S*.5)+'px '+cs.fontFamily;
+  x.textAlign='center'; x.textBaseline='alphabetic'; x.fillStyle='#fff';
+  const bx=P*S*.5, by=P*S*.66, em=P*S*.5;
+  x.fillText('7', bx, by);
+  const d=x.getImageData(0,0,c.width,c.height).data;
+  let x0=1e9,y0=1e9,x1=-1,y1=-1;
+  for(let yy=0;yy<c.height;yy++){
+    const row=yy*c.width;
+    for(let xx=0;xx<c.width;xx++){
+      if(d[(row+xx)*4+3]>40){
+        if(xx<x0)x0=xx; if(xx>x1)x1=xx;
+        if(yy<y0)y0=yy; if(yy>y1)y1=yy;
+      }
+    }
+  }
+  if(x1<0) return null;
+  return {w:(x1-x0+1)/em, h:(y1-y0+1)/em, mid:(((y0+y1)/2)-by)/em};
+}
+/* where the baseline falls inside a line-height:1 box, measured off the DOM
+   rather than off the font's own tables — an inline-block of zero height
+   sits exactly on the baseline */
+function baselineOf(cs){
+  const s=document.createElement('span');
+  s.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;'+
+    'line-height:1;white-space:nowrap;font-weight:'+cs.fontWeight+
+    ';font-size:200px;font-family:'+cs.fontFamily;
+  const i=document.createElement('i');
+  i.style.cssText='display:inline-block;width:0;height:0;vertical-align:baseline';
+  s.appendChild(document.createTextNode('7')); s.appendChild(i);
+  document.body.appendChild(s);
+  const r=(i.getBoundingClientRect().bottom - s.getBoundingClientRect().top)/200;
+  s.remove();
+  return r;
+}
 function fitSeven(){
-  const PROBE=200, cs=getComputedStyle(ovSeven);
+  const cs=getComputedStyle(ovSeven);
   let F,dy=0;
   try{
-    gauge.font=cs.fontWeight+' '+PROBE+'px '+cs.fontFamily;
-    const m=gauge.measureText('7');
-    const asc=m.actualBoundingBoxAscent, desc=m.actualBoundingBoxDescent;
-    const inkH=(asc+desc)/PROBE;
-    const inkW=((m.actualBoundingBoxLeft+m.actualBoundingBoxRight)||m.width)/PROBE;
-    if(!(inkH>.1)||!(inkW>.1)) throw 0;
+    const ink=inkOf(cs);
+    if(!ink||!(ink.h>.1)||!(ink.w>.05)) throw 0;
     const narrow=innerWidth<820;
     /* it runs off the foot of the screen on purpose */
-    F=Math.min(innerHeight*(narrow?.62:.94)/inkH,
-               innerWidth *(narrow?.80:.62)/inkW);
-    /* find the baseline inside a line-height:1 box, so the ink's own middle
-       — not the line box's — lands on the middle of the screen */
-    const fbA=m.fontBoundingBoxAscent/PROBE, fbD=m.fontBoundingBoxDescent/PROBE;
-    const baseline=((1-(fbA+fbD))/2+fbA)*F;
-    dy=F/2-(baseline+((desc-asc)/PROBE*F)/2);
-  }catch(e){ F=Math.min(innerHeight*.9,innerWidth*.7); dy=0; }
+    F=Math.min(innerHeight*(narrow?.60:FIT.h)/ink.h,
+               innerWidth *(narrow?.80:.62)/ink.w);
+    ov.style.setProperty('--sev',F.toFixed(1)+'px');
+    ov.style.setProperty('--dy','0px');
+    /* rather than predict where the glyph lands — grid overflow, line-box
+       rounding and the reveal transform all get a vote — put it there with
+       no offset, read where the ink actually sits, and correct once */
+    const t=ovSeven.style.transform; ovSeven.style.transform='none';
+    const top=ovSeven.getBoundingClientRect().top;
+    ovSeven.style.transform=t;
+    const inkMid=top+baselineOf(cs)*F+ink.mid*F;
+    dy=innerHeight*(narrow?.56:FIT.cy)-inkMid;
+  }catch(e){ F=Math.min(innerHeight*1.05,innerWidth*.7); dy=0; }
   ov.style.setProperty('--sev',F.toFixed(1)+'px');
   ov.style.setProperty('--dy', dy.toFixed(1)+'px');
 }
