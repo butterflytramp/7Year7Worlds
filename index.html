@@ -681,24 +681,59 @@ try{
   renderer = new THREE.WebGLRenderer({canvas:document.getElementById('scene'),
     antialias:true, powerPreference:'high-performance'});
 }catch(e){ document.getElementById('nogl').style.display='grid'; throw e; }
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
+/* one budget for the whole rig, so a thin laptop keeps the composition and
+   only loses resolution */
+const LOWPOWER = innerWidth<820 || (navigator.hardwareConcurrency||8)<=4;
+renderer.setPixelRatio(Math.min(devicePixelRatio, LOWPOWER?1.4:1.8));
 renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.14;      /* fixed: no adaptation, no pumping */
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const PAPER=0xfbfaf7, INK=0x1c1c1a, CLAY=0xc2542e, NAVY=0x0b1e3a;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(PAPER);
-scene.fog = new THREE.FogExp2(PAPER, .016);
+/* a warm, thin haze instead of a dense white one: the far end used to
+   blow out to paper by the second doorway, which read as a clipped
+   highlight rather than distance */
+scene.fog = new THREE.FogExp2(0xe4d9c6, .0088);
 
 const camera = new THREE.PerspectiveCamera(58, innerWidth/innerHeight, .1, 300);
 camera.position.set(0,2.2,8);
 if(innerWidth/innerHeight < .8) camera.fov = 70;
 
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
-
-scene.add(new THREE.AmbientLight(0xffffff, .9));
-const hemi = new THREE.HemisphereLight(0xffffff, 0xe8e4da, .5); scene.add(hemi);
+/* RoomEnvironment is a bright, even photo studio — it lit every surface of
+   this corridor identically, which is most of why the space read flat. This
+   stands in a room shaped like the corridor itself: light ceiling, mid
+   walls, dark floor, with the two runs of ceiling light in it so the
+   parquet has something real to reflect. */
+function corridorEnv(){
+  const s=new THREE.Scene();
+  const C=h=>new THREE.MeshBasicMaterial({color:h, side:THREE.BackSide});
+  /* material order is +x,-x,+y,-y,+z,-z — index 2 is the ceiling, 3 the floor */
+  s.add(new THREE.Mesh(new THREE.BoxGeometry(11,7,30),
+    [C(0x77695a),C(0x77695a),C(0xfff0d2),C(0x3a2e20),C(0x77695a),C(0x77695a)]));
+  const lens=new THREE.PlaneGeometry(1.5,24);
+  for(const x of [-2.4,2.4]){
+    const m=new THREE.Mesh(lens, new THREE.MeshBasicMaterial({color:0xfff7ea}));
+    m.rotation.x=Math.PI/2; m.position.set(x,3.44,0); s.add(m);
+  }
+  return s;
+}
+{
+  const env=corridorEnv();
+  scene.environment = pmrem.fromScene(env, .04).texture;
+  env.traverse(o=>{ if(o.isMesh){ o.geometry.dispose(); } });
+}
+/* almost no flat ambient. What was AmbientLight(.9) + Hemisphere(.5) is now
+   a floor-to-ceiling bounce: warm from the lit ceiling, oak-coloured from
+   the parquet, plus a sliver of ambient purely to keep shadows from
+   crushing to black. */
+scene.add(new THREE.AmbientLight(0xfff6ea, .085));
+const hemi = new THREE.HemisphereLight(0xffeeda, 0x8a7050, .5); scene.add(hemi);
 
 
 /* ============ the gallery ============ */
@@ -779,7 +814,12 @@ function parquetTexture(){
 }
 const parq=parquetTexture(); parq.repeat.set(3,40);
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(24,320),
-  corrMat(0xffffff,{map:parq, roughness:.38, metalness:.05, envMapIntensity:.4}));
+  /* the grain doubles as a roughness map, so the sheen breaks up along the
+     boards instead of reading as one wet sheet. It is the same sRGB texture
+     in both slots on purpose — a linear clone would double the upload for a
+     variation this subtle. */
+  corrMat(0xffffff,{map:parq, roughnessMap:parq, roughness:.58, metalness:.04,
+    envMapIntensity:.42}));
 floor.rotation.x=-Math.PI/2; floor.position.set(0,0,-90); scene.add(floor);
 /* tall walls — high-ceiling gallery, subtle plaster texture */
 function wallTexture(base){
@@ -825,7 +865,8 @@ function buildWall(x, zFrom, zTo, gaps, tex, perUnit, rotY){
     const tx=tex.clone(); tx.needsUpdate=true;
     tx.wrapS=tx.wrapT=THREE.RepeatWrapping;
     tx.repeat.set(len*perUnit, 1);
-    const m=new THREE.Mesh(new THREE.PlaneGeometry(len,18), corrMat(0xffffff,{map:tx}));
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(len,18),
+      corrMat(0xffffff,{map:tx, roughnessMap:tx, roughness:1, envMapIntensity:.22}));
     m.rotation.y=rotY; m.position.set(x, 9, (a+b)/2); scene.add(m);
   }
 }
@@ -865,14 +906,34 @@ function contactShadow(x,z,sx,sz,cap){
   m.rotation.x=-Math.PI/2; m.scale.set(sx,sz,1);
   m.position.set(x,.0115,z); scene.add(m);
 }
-/* ceiling with recessed light slots */
+/* ceiling with linear luminaires */
 const ceil=new THREE.Mesh(new THREE.PlaneGeometry(24,320), corrMat(0xf0ede4));
 ceil.rotation.x=Math.PI/2; ceil.position.set(0,13.6,-90); scene.add(ceil);
-for(let i=0;i<14;i++){
-  const slot=new THREE.Mesh(new THREE.PlaneGeometry(7,.4),
-    new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0}));
-  slot.material.userData.cap=.95; corridorMats.push(slot.material);
-  slot.rotation.x=Math.PI/2; slot.position.set(0,13.55,-20-i*12.5); scene.add(slot);
+
+/* The slots were 0.4-unit white planes lying on the ceiling — emissive lines
+   with nothing behind them. Each is now a surface-mounted luminaire with a
+   housing, a shadow gap under the ceiling and a lens set into its underside,
+   so it has depth and a plausible body. FIX_Z is also the schedule the light
+   pool below runs off. */
+const FIX_Z=[], FIX_Z0=-8, FIX_STEP=11.4, FIX_N=17;
+const fixLens=[];
+{
+  const housMat=corrMat(0xdedad0,{roughness:.62, metalness:.18, envMapIntensity:.5});
+  const cheekMat=corrMat(0x8e8880,{roughness:.75});
+  for(let i=0;i<FIX_N;i++){
+    const z=FIX_Z0-i*FIX_STEP; FIX_Z.push(z);
+    const hous=new THREE.Mesh(new THREE.BoxGeometry(9.6,.30,.62), housMat);
+    hous.position.set(0,13.30,z); scene.add(hous);
+    /* the reveal between fixture and ceiling — a dark gap reads as depth */
+    const gap=new THREE.Mesh(new THREE.BoxGeometry(9.4,.14,.44), cheekMat);
+    gap.position.set(0,13.50,z); scene.add(gap);
+    const lens=new THREE.Mesh(new THREE.PlaneGeometry(9.3,.44),
+      new THREE.MeshBasicMaterial({color:0xfff4e2, transparent:true, opacity:0,
+        depthWrite:false}));
+    lens.material.userData.cap=.96; corridorMats.push(lens.material);
+    lens.rotation.x=Math.PI/2; lens.position.set(0,13.145,z); scene.add(lens);
+    fixLens.push(lens);
+  }
 }
 /* skirting line where wall meets floor */
 for(const side of [-1,1]){
@@ -894,13 +955,50 @@ for(const [side,z] of COLS){
     contactShadow(side*4.75, z+.2, 1.15, .55, .4);
   }
 }
-/* linear LED cove lines running the length of the ceiling edge */
+/* Cove lighting at the wall head. The old version was a 0.08-wide plane
+   floating at the ceiling edge and lighting nothing. Now: a recessed channel
+   with a lip that hides the source, the emissive strip inside it, and a
+   gradient wash down the wall so the strip visibly does something. The wash
+   is painted rather than lit — a real grazing light along 300 units of wall
+   would cost more than it is worth here. */
+function coveWashTexture(){
+  const c=document.createElement('canvas'); c.width=8; c.height=256;
+  const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,'rgba(255,238,214,.62)');
+  g.addColorStop(.18,'rgba(255,234,206,.34)');
+  g.addColorStop(.55,'rgba(255,230,200,.10)');
+  g.addColorStop(1,'rgba(255,228,198,0)');
+  x.fillStyle=g; x.fillRect(0,0,8,256);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+const coveWashTex=coveWashTexture();
 for(const side of [-1,1]){
-  const cove=new THREE.Mesh(new THREE.PlaneGeometry(.08,314),
-    new THREE.MeshBasicMaterial({color:0xeef4ff, transparent:true, opacity:0}));
-  cove.material.userData.cap=.8; corridorMats.push(cove.material);
-  cove.rotation.x=-Math.PI/2; cove.rotation.z=Math.PI/2;
-  cove.position.set(side*5.7, 13.2, -90); scene.add(cove);
+  /* the lip that conceals the strip */
+  const lip=new THREE.Mesh(new THREE.BoxGeometry(.34,.22,314),
+    corrMat(0xf3efe6,{roughness:.9}));
+  lip.position.set(side*5.62, 12.86, -90); scene.add(lip);
+  /* the strip itself, set back behind the lip */
+  const cove=new THREE.Mesh(new THREE.PlaneGeometry(314,.20),
+    new THREE.MeshBasicMaterial({color:0xffeeca, transparent:true, opacity:0,
+      depthWrite:false, side:THREE.DoubleSide}));
+  cove.material.userData.cap=.9; corridorMats.push(cove.material);
+  cove.rotation.y=side>0? -Math.PI/2 : Math.PI/2;
+  cove.position.set(side*5.80, 13.06, -90); scene.add(cove);
+  /* what the strip throws onto the wall below it */
+  const wash=new THREE.Mesh(new THREE.PlaneGeometry(314,7.4),
+    new THREE.MeshBasicMaterial({map:coveWashTex, transparent:true, opacity:0,
+      depthWrite:false, blending:THREE.AdditiveBlending}));
+  wash.material.userData.cap=.36; corridorMats.push(wash.material);
+  wash.rotation.y=side>0? -Math.PI/2 : Math.PI/2;
+  wash.position.set(side*5.90, 9.2, -90); scene.add(wash);
+  /* and a little of it back onto the ceiling */
+  const up=new THREE.Mesh(new THREE.PlaneGeometry(314,2.6),
+    new THREE.MeshBasicMaterial({map:coveWashTex, transparent:true, opacity:0,
+      depthWrite:false, blending:THREE.AdditiveBlending}));
+  up.material.userData.cap=.3; corridorMats.push(up.material);
+  up.rotation.x=Math.PI/2; up.rotation.z=Math.PI/2;
+  up.position.set(side*4.4, 13.56, -90); scene.add(up);
 }
 
 /* the dramatic curved navy ceiling — vault over the sealed run and door 07 */
@@ -935,7 +1033,7 @@ for(const side of [-1,1]){
 
 /* museum accent spots over the sealed doors and door 07 */
 function spot(x,z,tx,tz,intensity){
-  const s=new THREE.SpotLight(0xffffff,intensity,26,.5,.9,1.4);
+  const s=new THREE.SpotLight(0xfff1dc,intensity*11,30,.52,.88,2);
   s.position.set(x,11.5,z);
   s.target.position.set(tx,1.5,tz); scene.add(s); scene.add(s.target);
 }
@@ -1201,7 +1299,9 @@ function hangArt(src, ratio, h, z, side, y=2.7){
   const wash=new THREE.Mesh(new THREE.PlaneGeometry(w+2,h+2.6),
     new THREE.MeshBasicMaterial({map:pickTex, transparent:true, opacity:0,
       depthWrite:false}));
-  wash.material.userData.cap=.5; corridorMats.push(wash.material);
+  /* the painted picture-light wash drops right back — real aimed spots do
+     this job now, and this only keeps the distant works off pure black */
+  wash.material.userData.cap=.15; corridorMats.push(wash.material);
   wash.position.set(0,y+.5,.012); g.add(wash);
   /* soft wall shadow under the frame */
   const sh=new THREE.Mesh(new THREE.PlaneGeometry(w+.6,h+.6),
@@ -1228,6 +1328,7 @@ function hangArt(src, ratio, h, z, side, y=2.7){
   art.userData={kind:'art', grp:g};
   clickables.push(art);
   g.position.set(side*5.96, 0, z);
+  g.userData.art={side:side, z:z, y:y, w:w, h:h};
   /* one tilt for every work in the collection, turned toward the walker
      rather than flat to the wall, so each is met at the same angle */
   g.rotation.y=side>0? -Math.PI/2+ART_TILT : Math.PI/2-ART_TILT;
@@ -1299,6 +1400,150 @@ const clayFleck=new THREE.Sprite(new THREE.SpriteMaterial({
   transparent:true, opacity:0, depthWrite:false}));
 clayFleck.scale.set(.22,.22,1); clayFleck.position.set(1.6,3.4,-85);
 scene.add(clayFleck);
+
+/* ================= THE LIGHT RIG =================
+   A 250-unit corridor cannot afford a real luminaire at every fixture, so
+   the lights travel: a small pool follows the camera and re-aims itself at
+   whatever is nearest. Everything past the pool is carried by the
+   environment, the cove wash and the emissive lenses, which is also roughly
+   how the eye reads a long gallery — you see the far end as glow, not as
+   individual pools.
+   Two of the ceiling lights cast shadows. Nothing else does, because a
+   second shadow map costs more than the fourth soft shadow is worth. */
+const RIG={
+  ceil:[], art:[], casters:2,
+  /* an ODD number of fixtures per side, centred on the one the camera is
+     nearest. That is what makes the hand-off invisible: when the window
+     slides, the light that wraps round moves between two fixtures that are
+     the same distance away, so its brightness does not change at all. An
+     even window would swap a near fixture for a far one and pop. */
+  perSide: LOWPOWER?1:3,
+  nCeil: (LOWPOWER?1:3)*2,
+  nArt : LOWPOWER?2:4,
+  on:false
+};
+{
+  const SH = LOWPOWER?512:1024;
+  for(let i=0;i<RIG.nCeil;i++){
+    /* a wall-washer: hung off-centre and aimed at the wall it serves, so the
+       plaster is grazed and the art surround is lit, rather than a hot pool
+       dropped on the middle of the floor */
+    const L=new THREE.SpotLight(0xfff0d6, 0, 34, .72, .96, 2);
+    L.position.set(0,13.0,0);
+    L.target.position.set(0,0,0);
+    if(i<RIG.casters){
+      L.castShadow=true;
+      L.shadow.mapSize.set(SH,SH);
+      L.shadow.camera.near=1.4; L.shadow.camera.far=24;
+      L.shadow.bias=-0.0009;          /* against acne on the long floor plane */
+      L.shadow.normalBias=0.035;      /* against peter-panning at the skirting */
+      L.shadow.radius=3;
+    }
+    scene.add(L); scene.add(L.target); RIG.ceil.push(L);
+  }
+  for(let i=0;i<RIG.nArt;i++){
+    /* a track head: tight, soft-edged, aimed down the wall at one work */
+    const L=new THREE.SpotLight(0xfff4e6, 0, 18, .44, .84, 2);
+    /* only the head on the nearest work casts. That is the one whose frame
+       edge you are close enough to read a shadow from; the rest would be
+       three more shadow maps for something nobody sees. */
+    if(i===0){
+      L.castShadow=true;
+      L.shadow.mapSize.set(LOWPOWER?512:1024,LOWPOWER?512:1024);
+      L.shadow.camera.near=.6; L.shadow.camera.far=15;
+      L.shadow.bias=-0.0006; L.shadow.normalBias=0.018; L.shadow.radius=2;
+    }
+    scene.add(L); scene.add(L.target); RIG.art.push(L);
+  }
+}
+
+/* track rail and heads, so the artwork lights have a body they come from */
+const artHeads=[];
+{
+  const railMat=corrMat(0x9a938a,{roughness:.5, metalness:.55, envMapIntensity:.7});
+  for(const side of [-1,1]){
+    const rail=new THREE.Mesh(new THREE.BoxGeometry(.13,.13,306), railMat);
+    rail.position.set(side*3.5, 9.34, -90); scene.add(rail);
+  }
+  const headMat=corrMat(0x4a4642,{roughness:.42, metalness:.6, envMapIntensity:.8});
+  const headGeo=new THREE.CylinderGeometry(.17,.22,.5,10);
+  for(const g of artGroups){
+    const a=g.userData.art; if(!a) continue;
+    const head=new THREE.Mesh(headGeo, headMat);
+    head.position.set(a.side*3.5, 9.1, a.z);
+    /* tip it toward the wall it serves */
+    head.rotation.z = a.side>0 ? -0.5 : 0.5;
+    scene.add(head); artHeads.push(head);
+  }
+}
+
+/* who casts and who receives. Boxes cast — columns, frames, skirting, rails,
+   benches, door jambs; the big wall and floor planes only receive, since a
+   plane casting onto itself is where shadow acne comes from. */
+function armShadows(){
+  scene.traverse(function(o){
+    if(!o.isMesh||!o.material) return;
+    const m=o.material;
+    if(m.isMeshStandardMaterial||m.isMeshPhysicalMaterial){
+      o.receiveShadow=true;
+      o.castShadow = o.geometry && o.geometry.type==='BoxGeometry';
+    }
+  });
+}
+armShadows();
+
+const _near=[];
+let rigArmed=false;
+function updateRig(camZ, built){
+  /* hold the lights off until the corridor has actually materialised, or
+     invisible geometry throws shadows into an empty room */
+  if(built<=0.02){
+    if(RIG.on){ for(const L of RIG.ceil) L.intensity=0;
+                for(const L of RIG.art) L.intensity=0; RIG.on=false; }
+    if(rigArmed){ renderer.shadowMap.enabled=false; rigArmed=false; }
+    return;
+  }
+  RIG.on=true;
+  if(!rigArmed && built>0.5){ renderer.shadowMap.enabled=true; rigArmed=true; }
+  if(rigArmed && built<=0.5){ renderer.shadowMap.enabled=false; rigArmed=false; }
+
+  /* --- ceiling luminaires nearest the camera --- */
+  const mid=Math.round((FIX_Z0-camZ)/FIX_STEP);   /* fixture under the camera */
+  const half=(RIG.perSide-1)/2;
+  for(let k=0;k<RIG.ceil.length;k++){
+    const side = (k%2) ? 1 : -1;
+    const idx=Math.min(FIX_N-1, Math.max(0, mid + (((k/2)|0) - half)));
+    const z=FIX_Z[idx];
+    const L=RIG.ceil[k];
+    L.position.set(side*2.7, 13.00, z);
+    L.target.position.set(side*4.7, 1.1, z);
+    L.target.updateMatrixWorld();
+    /* purely a function of distance, so the wrap-around is silent */
+    const d=Math.abs(z-camZ);
+    L.intensity = 235*built*Math.max(0, 1-Math.max(0,d-6)/16);
+  }
+
+  /* --- track heads, nearest work first, so the one head that casts a
+         shadow is always on the work you are standing in front of --- */
+  _near.length=0;
+  for(const g of artGroups){
+    const a=g.userData.art; if(!a) continue;
+    const d=Math.abs(a.z-camZ);
+    if(d<20) _near.push({d:d, a:a});
+  }
+  _near.sort(function(A,B){return A.d-B.d});
+  for(let k=0;k<RIG.art.length;k++){
+    const L=RIG.art[k];
+    if(k>=_near.length){ L.intensity=0; continue; }
+    const a=_near[k].a, d=_near[k].d;
+    L.position.set(a.side*3.5, 9.05, a.z);
+    L.target.position.set(a.side*5.9, a.y, a.z);
+    L.target.updateMatrixWorld();
+    L.intensity = 54*built*Math.max(0, 1-Math.max(0,d-9)/11);
+  }
+}
+/* ================= END LIGHT RIG ================= */
+
 /* ============ director ============ */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>t*t*(3-2*t);
@@ -1420,6 +1665,7 @@ function frame(){
   /* corridor summoned by the thesis */
   const built=sstep(.085,.125,p);
   for(const m of corridorMats) m.opacity=built*(m.userData.cap||1);
+  updateRig(camera.position.z, built);
 
   /* flecks — the meal */
   const fw=sstep(.23,.275,p)*(1-sstep(.34,.41,p));
