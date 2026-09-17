@@ -1,2 +1,5 @@
 .DS_Store
 **/.DS_Store
+*.bak
+
+# index.html is GENERATED. Edit src/ then run: python3 build.py

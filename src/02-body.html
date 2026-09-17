@@ -1,0 +1,322 @@
+
+<body>
+
+<canvas id="scene"></canvas>
+<div id="whiteout"></div>
+<div id="grain"></div>
+<div id="veil"></div>
+
+<div id="nogl"><p><strong>This museum needs WebGL.</strong><br>
+Your browser couldn't start the 3D scene. Try Chrome, Edge, Firefox or Safari
+with hardware acceleration enabled. The index of worlds is at the foot of the page.</p></div>
+
+<div id="soon">soon.</div>
+
+<!-- the way in: two black halves and a line of light between them -->
+<div id="reveal" aria-hidden="true">
+  <div class="half l"></div><div class="half r"></div><div class="line"></div>
+</div>
+
+<!-- ================= THE OVERTURE ================= -->
+<header id="ov">
+  <div class="ov-field" aria-hidden="true"></div>
+  <div class="ov-sweep a" aria-hidden="true"></div>
+  <div class="ov-sweep b" aria-hidden="true"></div>
+  <div class="ov-cut" aria-hidden="true"></div>
+
+  <div class="ov-stage" aria-hidden="true">
+    <div class="ov-halo"></div>
+    <div class="ov-seven">7</div>
+  </div>
+
+  <h1 class="ov-sr">7 Years, 7 Worlds — Studio How About That!</h1>
+
+  <div class="ov-ui">
+    <div class="ov-scrim" aria-hidden="true"></div>
+    <span class="ov-m ov-tl">Studio How About That!</span>
+    <span class="ov-m ov-tr">Year VII · MMXXVI</span>
+    <span class="ov-t ov-years">Seven Years</span>
+    <span class="ov-t ov-worlds">Seven Worlds</span>
+    <p class="ov-ode">An ode to the worlds we’ve called home</p>
+    <button class="ov-enter" id="ov-enter" type="button">
+      <span class="rule" aria-hidden="true"></span>
+      Enter the museum
+      <span class="chev" aria-hidden="true">↓</span>
+    </button>
+  </div>
+
+  <div class="ov-grain" aria-hidden="true"></div>
+</header>
+
+<script>
+/* ================= THE OVERTURE =================
+   Self-contained: it sizes the numeral off its own measured ink, plays the
+   reveal, and drives its own departure from the scroll position. Nothing
+   here depends on the 3D scene, so the opening still stands if WebGL or
+   the CDN does not. */
+(function(){
+const ov=document.getElementById('ov');
+if(!ov) return;
+const stage=ov.querySelector('.ov-stage');
+const field=ov.querySelector('.ov-field');
+const cut  =ov.querySelector('.ov-cut');
+const ui   =ov.querySelector('.ov-ui');
+const seven=ov.querySelector('.ov-seven');
+const sweeps=[...ov.querySelectorAll('.ov-sweep')];
+const quiet=matchMedia('(prefers-reduced-motion:reduce)');
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const S=(a,b,v)=>{const t=cl((v-a)/(b-a),0,1);return t*t*(3-2*t)};
+
+/* Font tables lie often enough — old-style figures, a fallback that is not
+   the face you asked for — that the glyph is rasterised once and its ink box
+   read off the pixels, so the composition holds whatever font resolves. */
+const FIT={h:.70, cy:.400};
+function inkOf(cs){
+  const P=140, K=3, c=document.createElement('canvas');
+  c.width=c.height=P*K;
+  const x=c.getContext('2d');
+  x.font=cs.fontStyle+' '+cs.fontWeight+' '+(P*K*.5)+'px '+cs.fontFamily;
+  x.textAlign='center'; x.textBaseline='alphabetic'; x.fillStyle='#fff';
+  const bx=P*K*.5, by=P*K*.66, em=P*K*.5;
+  x.fillText('7', bx, by);
+  const d=x.getImageData(0,0,c.width,c.height).data;
+  let x0=1e9,y0=1e9,x1=-1,y1=-1;
+  for(let yy=0;yy<c.height;yy++){
+    const row=yy*c.width;
+    for(let xx=0;xx<c.width;xx++){
+      if(d[(row+xx)*4+3]>40){
+        if(xx<x0)x0=xx; if(xx>x1)x1=xx;
+        if(yy<y0)y0=yy; if(yy>y1)y1=yy;
+      }
+    }
+  }
+  if(x1<0) return null;
+  return {w:(x1-x0+1)/em, h:(y1-y0+1)/em, mid:(((y0+y1)/2)-by)/em};
+}
+function baselineOf(cs){
+  const s=document.createElement('span');
+  s.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;line-height:1;'+
+    'white-space:nowrap;font-style:'+cs.fontStyle+';font-weight:'+cs.fontWeight+
+    ';font-size:200px;font-family:'+cs.fontFamily;
+  const i=document.createElement('i');
+  i.style.cssText='display:inline-block;width:0;height:0;vertical-align:baseline';
+  s.appendChild(document.createTextNode('7')); s.appendChild(i);
+  document.body.appendChild(s);
+  const r=(i.getBoundingClientRect().bottom - s.getBoundingClientRect().top)/200;
+  s.remove();
+  return r;
+}
+function fitSeven(){
+  const cs=getComputedStyle(seven);
+  let F,dy=0;
+  try{
+    const ink=inkOf(cs);
+    if(!ink||!(ink.h>.1)||!(ink.w>.05)) throw 0;
+    const narrow=innerWidth<820;
+    F=Math.min(innerHeight*(narrow?.46:FIT.h)/ink.h, innerWidth*(narrow?.68:.44)/ink.w);
+    ov.style.setProperty('--sev',F.toFixed(1)+'px');
+    ov.style.setProperty('--dy','0px');
+    /* put it there with no offset, read where the ink actually lands, correct once */
+    const t=seven.style.transform; seven.style.transform='none';
+    const top=seven.getBoundingClientRect().top;
+    seven.style.transform=t;
+    const inkMid=top+baselineOf(cs)*F+ink.mid*F;
+    dy=innerHeight*FIT.cy-inkMid;
+  }catch(e){ F=Math.min(innerHeight*.8,innerWidth*.5); dy=0; }
+  ov.style.setProperty('--sev',F.toFixed(1)+'px');
+  ov.style.setProperty('--dy', dy.toFixed(1)+'px');
+}
+
+let lit=false;
+function raise(){ if(lit) return; lit=true; fitSeven(); ov.classList.add('lit'); }
+((document.fonts&&document.fonts.ready)||Promise.resolve())
+  .then(function(){requestAnimationFrame(function(){requestAnimationFrame(raise)})});
+setTimeout(raise,900);
+let rz; addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(fitSeven,120)},{passive:true});
+
+document.getElementById('ov-enter').addEventListener('click',function(){
+  const h=document.documentElement.scrollHeight-innerHeight;
+  scrollTo({top:h*.125, behavior:quiet.matches?'auto':'smooth'});
+});
+
+/* warm white, then the numeral swallows the frame, then the dark the line of
+   light will open. The handover is a room going out, not a cut. */
+const WHITE=[233,228,217], VOID=[6,5,10];
+function ground(t){
+  return 'rgb('+WHITE.map(function(v,i){return Math.round(v+(VOID[i]-v)*t)}).join(',')+')';
+}
+
+let raf=0, mx=0, my=0, sx=0, sy=0, driving=false;
+function tick(){
+  const h=document.documentElement.scrollHeight-innerHeight;
+  const p=h>0?scrollY/h:0;
+  if(!quiet.matches){
+    sx+=(mx-sx)*.06; sy+=(my-sy)*.06;
+    const drift=1-S(.006,.026,p);
+    ov.style.setProperty('--px',(sx*drift).toFixed(3));
+    ov.style.setProperty('--py',(sy*drift).toFixed(3));
+  }
+  if(p>.003 || driving){
+    if(!driving){ driving=true; ov.classList.add('driving'); }
+    const fly  = S(.010,.060,p);   /* you move into the numeral      */
+    const marks= S(.006,.030,p);   /* the annotations step back first */
+    const dark = S(.020,.056,p);   /* the room goes out               */
+    const away = S(.052,.072,p);   /* and the plate bows out          */
+    const reach=quiet.matches?.8:8.5;
+    stage.style.transform='scale('+(1+reach*Math.pow(fly,1.7)).toFixed(3)+')';
+    for(const s of sweeps){ s.style.opacity=(1-S(.006,.040,p)).toFixed(3); }
+    field.style.backgroundImage='none';
+    field.style.backgroundColor=ground(dark);
+    field.style.opacity='1';
+    cut.style.opacity=(.75+.25*fly).toFixed(3);
+    cut.style.filter='blur('+(fly*1.2).toFixed(2)+'px)';
+    ui.style.opacity=(1-marks).toFixed(3);
+    ui.style.transform='translateY('+(-26*marks).toFixed(1)+'px)';
+    ov.style.opacity=(1-away).toFixed(3);
+  }
+  if(p<.095){ raf=requestAnimationFrame(tick); }
+  else { ov.style.display='none'; raf=0; }
+}
+function wake(){ if(!raf){ ov.style.display=''; raf=requestAnimationFrame(tick); } }
+addEventListener('scroll',wake,{passive:true});
+addEventListener('pointermove',function(e){
+  mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2; wake();
+},{passive:true});
+wake();
+})();
+</script>
+
+<!-- ================= THE NOTE ================= -->
+<section class="act sbeat" data-s="0.118" data-e="0.152">
+  <div class="eyebrow">Seven Years · Seven Worlds</div>
+  <h2>How About <em>Another</em> World?</h2>
+</section>
+
+<section class="act sbeat" data-s="0.155" data-e="0.190">
+  <p class="lead">We’re entering our seventh year. Come somewhere new with us.</p>
+  <p class="quiet">At How About That!, we wanted to give ourselves a birthday brief:
+  take seven subjects that inspire us and build a world around each.</p>
+</section>
+
+<section class="act sbeat" data-s="0.193" data-e="0.226">
+  <p class="lead">Follow the stories. Experiment with the design.</p>
+  <p class="quiet">The result is a collection of seven immersive experiences,
+  each with its own atmosphere and a different story to tell.</p>
+</section>
+
+<section class="act sbeat" data-s="0.229" data-e="0.268">
+  <p class="quiet">We’re making them to see where our interests can take our work,
+  and to share the pleasure of discovering something along the way.</p>
+  <p class="lead">Pick a world. We’ll meet you inside.</p>
+  <button class="cta" id="story-cta" type="button">Explore the seven worlds</button>
+</section>
+
+
+<!-- world placards: bottom-left, museum wayfinding. Windows are set from the
+     architecture itself (see WORLDS in the engine) -->
+<section class="act doorlbl" data-world="0">
+  <div class="plaq w01">
+    <div class="num">01</div>
+    <div class="lbl"><b>World 01 · Retro Games</b></div>
+    <div class="lbl">Open</div>
+    <div class="enter">Enter world →</div>
+  </div>
+</section>
+<section class="act doorlbl" data-world="1">
+  <div class="plaq w02">
+    <div class="num">02</div>
+    <div class="lbl"><b>World 02 · Y2K</b></div>
+    <div class="lbl">Open</div>
+    <div class="enter">Enter world →</div>
+  </div>
+</section>
+<section class="act doorlbl" data-world="2">
+  <div class="plaq w03">
+    <div class="num">03</div>
+    <div class="lbl"><b>World 03 · The Ice Age</b></div>
+    <div class="lbl">Open</div>
+    <div class="enter">Enter world →</div>
+  </div>
+</section>
+<!-- 04–06 are sealed. DATES BELOW ARE PLACEHOLDERS — edit the "Dropping on"
+     lines here, in the 07 plaque and in the footer once the schedule is locked. -->
+<section class="act doorlbl" data-world="3">
+  <div class="plaq">
+    <div class="num">04</div>
+    <div class="lbl"><b>World 04 · To Be Revealed</b></div>
+    <div class="lbl">Dropping on 21st Oct</div>
+  </div>
+</section>
+<section class="act doorlbl" data-world="4">
+  <div class="plaq">
+    <div class="num">05</div>
+    <div class="lbl"><b>World 05 · To Be Revealed</b></div>
+    <div class="lbl">Dropping on 18th Nov</div>
+  </div>
+</section>
+<section class="act doorlbl" data-world="5">
+  <div class="plaq">
+    <div class="num">06</div>
+    <div class="lbl"><b>World 06 · To Be Revealed</b></div>
+    <div class="lbl">Dropping on 16th Dec</div>
+  </div>
+</section>
+<section class="act doorlbl" data-world="6">
+  <div class="plaq brass">
+    <div class="lbl"><b>World 07 · To Be Revealed</b></div>
+    <p class="thesis">Seven years. Seven worlds.<br>The last one: ours.</p>
+    <p class="story">Dropping on <strong>20th Jan, at the studio, Bangalore.</strong>
+    An RSVP evening; the door opens for the first time that night.</p>
+    <div class="invite">
+      <img src="__ASSET:world07-rsvp-qr.png__" alt="Scan to RSVP for the World 07 unveiling">
+      <div class="txt">SCAN FOR<br>DETAILS + RSVP<br>·<br>LIMITED ROOM</div>
+    </div>
+  </div>
+</section>
+
+<!-- footer index -->
+<section class="act" id="act-footer" data-s="0.955" data-e="1.01">
+  <p class="story" style="font-size:clamp(1.2rem,2.4vw,1.8rem)">The worlds stay open. Walk back any time.</p>
+  <div class="idx">
+    <a href="./RetroGames/"><span>01 · Retro Games</span><span class="st">ENTER →</span></a>
+    <a href="./Y2K/"><span>02 · Y2K</span><span class="st">ENTER →</span></a>
+    <a href="/iceage"><span>03 · The Ice Age</span><span class="st">ENTER →</span></a>
+    <div class="row next"><span>04 · To Be Revealed</span><span class="st">21ST OCT</span></div>
+    <div class="row"><span>05 · To Be Revealed</span><span class="st">18TH NOV</span></div>
+    <div class="row"><span>06 · To Be Revealed</span><span class="st">16TH DEC</span></div>
+    <div class="row w7"><span>07 · To Be Revealed</span><span class="st">20TH JAN · BANGALORE · RSVP</span></div>
+  </div>
+  <div class="passport">
+    <i class="got"></i><i class="got"></i><i class="got"></i><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="credit">A HAT! project · Studio How About That! · year seven</div>
+</section>
+
+<div class="hint" id="hint">Scroll to walk</div>
+
+<nav id="nav" aria-label="Worlds">
+  <span class="brand">7 / 7 WORLDS</span>
+  <div class="rail" id="rail"></div>
+  <button class="snd" id="snd" type="button" aria-pressed="false">SOUND · OFF</button>
+</nav>
+
+<div id="scroll-space"></div>
+
+<script>
+/* If the 3D module never arrives — a blocked CDN, an old browser — the black
+   halves of the way in would sit there forever. Give it six seconds, then
+   take the darkness down and show the index instead. */
+setTimeout(function(){
+  if(document.documentElement.classList.contains('gl-ready')) return;
+  var r=document.getElementById('reveal'); if(r) r.style.display='none';
+  var o=document.getElementById('ov'); if(o) o.style.display='none';
+  var n=document.getElementById('nogl'); if(n) n.style.display='grid';
+}, 6000);
+</script>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>

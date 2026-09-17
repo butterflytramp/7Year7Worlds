@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 Years 7 Worlds — How About That!</title>
+<meta name="description" content="Seven years. Seven worlds. The last one: ours. A year-long series of navigable worlds by Studio How About That!">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="How About That!">
+<meta property="og:title" content="7 Years 7 Worlds">
+<meta property="og:description" content="Seven years. Seven worlds. The last one: ours. Enter here.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23fbfaf7'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-style='italic' font-size='34' fill='%23c2542e' text-anchor='middle'%3E7%3C/text%3E%3C/svg%3E">
+<style>
+  /* ----------------------------------------------------------------
+     NAZARENA — the portal's face. Subset to the characters the build
+     actually sets and inlined as WOFF, so the page carries its own
+     typography and needs no font CDN.
+     One static weight was supplied (400, no italic, no variable axes),
+     so hierarchy is made with size, tracking, case and colour rather
+     than with weights the family does not have. It is a unicase deco
+     face — lowercase draws as capitals — which is why nothing here is
+     ever set in italic and why tracking stays generous.
+     ---------------------------------------------------------------- */
+  @font-face{
+    font-family:'Nazarena';
+    src:url(__ASSET:Nazarena.woff__) format('woff');
+    font-weight:400; font-style:normal; font-display:swap;
+  }
+  :root{
+    --display:'Nazarena',Georgia,'Times New Roman',serif;
+    --plain:'Nazarena',Georgia,'Times New Roman',serif;
+    --fallback:ui-sans-serif,system-ui,'Segoe UI',sans-serif;
+    --paper:#fbfaf7; --ink:#1c1c1a; --ink2:#5f5c54; --faint:#b8b4a8;
+    --clay:#c2542e; --navy:#0b2447;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#efebe3;color:var(--ink);
+    font-family:var(--plain);overflow-x:hidden}
+  ::selection{background:#c2542e33}
+  .serif{font-family:var(--display);font-weight:400}
+  .mono{font-family:var(--display);letter-spacing:.06em}
+
+  #scene{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block}
+  #grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.28;
+    background-image:radial-gradient(rgba(28,28,26,.05) 1px,transparent 1px);
+    background-size:5px 5px}
+  #scroll-space{position:relative;z-index:1;width:100%;height:1900vh}
+
+  /* ---------- the way in: darkness, a line of light, the museum ---------- */
+  #reveal{position:fixed;inset:0;z-index:7;pointer-events:none;overflow:hidden}
+  #reveal .half{position:absolute;top:0;bottom:0;width:50.5%;background:#06050a;will-change:transform}
+  #reveal .l{left:0}  #reveal .r{right:0}
+  #reveal .line{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;
+    background:#fff;opacity:0;box-shadow:0 0 18px 4px rgba(255,250,240,.9),0 0 80px 20px rgba(255,240,220,.5)}
+
+  /* ---------- placards & copy ---------- */
+  .act{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    padding:10vh 8vw;gap:1.2rem;
+    opacity:0;pointer-events:none;transition:opacity .7s ease;will-change:opacity}
+  .act.active{opacity:1}
+  .act p.story{font-family:var(--display);
+    font-size:clamp(1.5rem,3.2vw,2.5rem);line-height:1.45;color:var(--ink);max-width:880px}
+  .act .thesis{font-family:var(--display);
+    font-size:clamp(2.4rem,7vw,5.6rem);line-height:1.15;color:var(--ink);max-width:1000px}
+  .act .lbl{font-family:var(--display);font-size:.72rem;
+    letter-spacing:.30em;color:var(--ink);text-transform:uppercase}
+  .act .lbl b{color:var(--ink);font-weight:500}
+
+  /* world placards: small, bottom-left, precise */
+  .act.doorlbl{justify-content:flex-end;align-items:flex-start;text-align:left;
+    padding:0 0 11vh 4.5vw;gap:.55rem}
+  .plaq{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;
+    max-width:430px;padding:.2rem 0 .2rem 1.1rem;border-left:1px solid rgba(28,28,26,.5)}
+  .plaq .lbl{transition:color .6s ease}
+    .plaq .num{font-family:var(--display);
+    font-size:2.35rem;line-height:1;color:var(--ink);transition:color .6s}
+  .plaq p.story,.plaq .thesis{color:#3a362e;font-size:clamp(1rem,1.4vw,1.2rem)}
+  .plaq .thesis{font-size:clamp(1.25rem,2vw,1.7rem);line-height:1.35;max-width:360px}
+  .plaq .enter{font-family:var(--display);font-size:.66rem;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--ink2);opacity:0;transition:opacity .5s}
+  .plaq.near .enter{opacity:1}
+  .w01.tint .num,.w01.tint .lbl{color:#2f5cff}
+  .w02.tint .num,.w02.tint .lbl{color:#ff3366}
+  .w03.tint .num,.w03.tint .lbl{color:#1f8fb0}
+  .invite{display:flex;gap:16px;align-items:center;margin-top:.4rem}
+  .invite img{width:98px;height:98px;border:1px solid rgba(28,28,26,.15);border-radius:8px;display:block}
+  .invite .txt{font-family:var(--display);font-size:.68rem;letter-spacing:.18em;line-height:2;color:var(--ink2)}
+  .plaq.brass{border-left:none;padding:1.05rem 1.25rem .85rem;border-radius:3px;
+    background:linear-gradient(168deg,#d9b878,#c39d55 42%,#e3c286 58%,#b58f49);
+    box-shadow:0 5px 16px rgba(60,40,10,.28), inset 0 1px 0 rgba(255,240,200,.8),
+      inset 0 -1px 0 rgba(80,55,15,.4)}
+  .plaq.brass .lbl,.plaq.brass .num{color:#4a3a1c}
+  .plaq.brass .thesis,.plaq.brass p.story{color:#2e2410}
+  .plaq.brass p.story strong{color:#1d1608}
+  .plaq.brass .invite .txt{color:#4a3a1c}
+
+  /* custom cursors on portal hover */
+  body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}
+  body.cur-w02{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.45' stop-color='%23c8ccd4'/%3E%3Cstop offset='1' stop-color='%235a616e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='18' cy='18' r='13' fill='url(%23g)'/%3E%3Cellipse cx='13' cy='12' rx='4' ry='2.6' fill='%23ffffff' opacity='0.85'/%3E%3C/svg%3E") 18 18, pointer}
+  body.cur-w03{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ccircle cx='18' cy='18' r='12' fill='none' stroke='%23c9ecf7' stroke-width='2'/%3E%3Ccircle cx='18' cy='18' r='3' fill='%231f8fb0'/%3E%3C/svg%3E") 18 18, pointer}
+  body.cur-soon{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ccircle cx='18' cy='18' r='11' fill='none' stroke='%231c1c1a' stroke-width='1.2'/%3E%3Cpath d='M18 11v7l5 3' fill='none' stroke='%231c1c1a' stroke-width='1.2'/%3E%3C/svg%3E") 18 18, pointer}
+
+  /* ---------- footer index ---------- */
+  #act-footer{justify-content:center;gap:2.2rem}
+  #act-footer.active{pointer-events:auto}
+  .idx{display:flex;flex-direction:column;gap:.55rem;width:min(560px,88vw);
+    font-family:var(--display);font-size:.92rem;letter-spacing:.12em}
+  .idx a,.idx .row{display:flex;justify-content:space-between;align-items:center;
+    padding:.75rem .4rem;border-bottom:1px solid rgba(28,28,26,.14);
+    color:var(--ink);text-decoration:none;letter-spacing:.1em}
+  .idx a:hover{background:rgba(194,84,46,.06)}
+  .idx a .st{color:var(--navy)}
+  .idx .row{color:var(--faint)}
+  .idx .row .st{color:var(--faint);letter-spacing:.2em}
+  .idx .row.next{color:var(--ink2)}
+  .idx .row.w7{color:var(--ink)}
+  .idx .row.w7 .st{color:var(--clay)}
+  .passport{display:flex;gap:12px;align-items:center}
+  .passport i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--faint);display:inline-block}
+  .passport i.got{background:var(--clay);border-color:var(--clay)}
+  .credit{font-family:var(--display);font-size:.74rem;letter-spacing:.24em;color:var(--ink2);text-transform:uppercase}
+
+  #soon{position:fixed;z-index:6;pointer-events:none;opacity:0;
+    font-family:var(--display);font-size:.8rem;color:var(--paper);
+    background:var(--ink);padding:.35rem .9rem;border-radius:6px;transition:opacity .25s}
+  #soon.on{opacity:1}
+  #whiteout{position:fixed;inset:0;z-index:2;background:var(--paper);opacity:0;pointer-events:none}
+  #veil{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;background:#fff}
+
+  .hint{position:fixed;bottom:9vh;left:0;right:0;z-index:3;text-align:center;
+    font-family:var(--display);font-size:.7rem;letter-spacing:.34em;
+    color:var(--ink2);text-transform:uppercase;
+    animation:pulse 2.8s ease-in-out infinite;pointer-events:none;transition:opacity .5s}
+  .hint.off{animation:none;opacity:0}
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.85}}
+
+  /* ---------- museum navigation: 01 —— 02 —— … —— 07 ---------- */
+  #nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;
+    gap:22px;padding:14px 22px 16px;pointer-events:none;
+    font-family:var(--display);font-size:.66rem;letter-spacing:.2em;color:var(--ink2);
+    opacity:0;transition:opacity .8s}
+  #nav.on{opacity:1}
+  #nav .brand{white-space:nowrap;color:var(--ink)}
+  #nav .rail{flex:1;display:flex;align-items:center}
+  #nav .rail button{pointer-events:auto;background:none;border:0;cursor:pointer;
+    font:inherit;letter-spacing:inherit;color:var(--faint);padding:6px 2px;transition:color .4s}
+  #nav .rail button.on{color:var(--ink)}
+  #nav .rail button.open{color:var(--ink2)}
+  #nav .rail button.open.on{color:var(--ink)}
+  #nav .rail i{flex:1;height:1px;background:rgba(28,28,26,.18);position:relative;overflow:hidden}
+  #nav .rail i b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ink)}
+  #nav .snd{pointer-events:auto;background:none;border:0;cursor:pointer;font:inherit;
+    letter-spacing:inherit;color:var(--ink2);white-space:nowrap;padding:6px 0}
+  #nav .snd:hover{color:var(--ink)}
+  @media (max-width:760px){
+    #nav{gap:12px;padding:12px 14px}
+    #nav .brand{display:none}
+    .act.doorlbl{padding:0 7vw 12vh 6vw}
+  }
+
+  #nogl{position:fixed;inset:0;z-index:9;display:none;place-items:center;
+    background:var(--paper);text-align:center;padding:2rem}
+  #nogl p{max-width:520px;color:var(--ink2);line-height:1.7;
+    font-family:var(--fallback);font-size:.95rem}
+
+  @media (prefers-reduced-motion:reduce){ .hint{animation:none} }
+
+/* ================================================================
+   THE OVERTURE — the opening screen.
+   Same material world as the corridor: a warm-white field, one
+   monumental numeral cut into it like an aperture, a faint hairline of
+   light down the middle. On scroll you fly into the numeral, the field
+   goes dark, and that hairline becomes the line of light that opens the
+   museum. Delete #ov (markup, this block, and its script) to roll back.
+   ================================================================ */
+#ov{
+  --void:#06050a;
+  --px:0; --py:0;                     /* pointer, -1..1, set each frame */
+  position:fixed; inset:0; z-index:8; overflow:hidden;
+  pointer-events:none; isolation:isolate;
+  -webkit-font-smoothing:antialiased;
+}
+/* the ground: warm white, falling off to the corners like a lit room */
+.ov-field{position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 62% 48% at 47% 40%, #fffdf8 0%, rgba(255,253,248,0) 68%),
+    radial-gradient(ellipse 92% 86% at 50% 44%, #f6f2ea 0%, #e9e4d9 58%, #d8d1c3 100%);
+  opacity:0;transition:opacity 1.8s ease}
+#ov.lit .ov-field{opacity:1}
+
+/* two enormous soft sweeps — the same ribboning as the corridor's shells */
+.ov-sweep{position:absolute;border-radius:50%;pointer-events:none;
+  opacity:0;transition:opacity 2.2s ease .35s,transform 2.6s cubic-bezier(.16,.72,.2,1) .35s}
+#ov.lit .ov-sweep{opacity:1}
+.ov-sweep.a{left:-34vw;top:-52vh;width:118vw;height:152vh;
+  border:1px solid rgba(28,28,26,.055);
+  box-shadow:0 60px 160px -40px rgba(28,28,26,.10), inset 0 -80px 140px -60px rgba(255,255,255,.9);
+  transform:rotate(-7deg) scale(1.04) translate3d(calc(var(--px)*-10px),calc(var(--py)*-8px),0)}
+.ov-sweep.b{right:-52vw;bottom:-66vh;width:136vw;height:168vh;
+  border:1px solid rgba(28,28,26,.04);
+  box-shadow:0 -60px 170px -50px rgba(28,28,26,.09);
+  transform:rotate(5deg) scale(1.03) translate3d(calc(var(--px)*7px),calc(var(--py)*6px),0)}
+
+/* the hairline that will become the way in */
+.ov-cut{position:absolute;top:0;bottom:0;left:50%;width:1px;margin-left:-.5px;
+  background:linear-gradient(to bottom,rgba(255,244,224,0),rgba(255,238,210,.85) 22%,
+    rgba(255,238,210,.85) 78%,rgba(255,244,224,0));
+  box-shadow:0 0 26px 5px rgba(255,241,216,.55);
+  opacity:0;transition:opacity 1.6s ease 1.5s}
+#ov.lit .ov-cut{opacity:.75}
+
+/* the numeral, read as an opening rather than as a letter: warm light
+   spilling from behind a dark cut in the white */
+.ov-stage{position:absolute;inset:0;display:grid;place-items:center;
+  transform:translate3d(calc(var(--px)*-13px),calc(var(--py)*-10px),0)}
+.ov-halo{grid-area:1/1;width:44vh;height:44vh;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,240,214,.95) 0%,rgba(255,236,204,.45) 42%,rgba(255,236,204,0) 72%);
+  opacity:0;transition:opacity 2.4s ease .5s}
+#ov.lit .ov-halo{opacity:1}
+.ov-seven{grid-area:1/1;
+  font-family:var(--display);font-weight:400;
+  font-size:var(--sev,58vh);line-height:1;letter-spacing:0;user-select:none;
+  color:#15171d;text-align:center;
+  text-shadow:0 0 70px rgba(255,238,212,.9), 0 46px 90px rgba(28,28,26,.14);
+  opacity:0;transform:translateY(var(--dy,0px)) translateY(22px) scale(1.05);
+  transition:opacity 1.9s cubic-bezier(.2,.7,.25,1) .55s,
+             transform 2.5s cubic-bezier(.16,.72,.2,1) .55s}
+#ov.lit .ov-seven{opacity:1;transform:translateY(var(--dy,0px)) scale(1)}
+#ov.driving .ov-seven,#ov.driving .ov-stage,#ov.driving .ov-ui,
+#ov.driving .ov-field,#ov.driving .ov-sweep,#ov.driving .ov-cut{transition:none}
+
+/* micro-type: museum wayfinding, the corridor's own mono */
+.ov-ui{position:absolute;inset:0;pointer-events:none}
+/* the numeral's tail runs down through the foot of the frame on purpose;
+   this keeps the ode and the way in legible across it */
+.ov-scrim{position:absolute;left:0;right:0;bottom:0;height:26vh;pointer-events:none;
+  background:linear-gradient(to top,rgba(240,236,227,.88) 0%,rgba(240,236,227,.52) 46%,rgba(240,236,227,0) 100%);
+  opacity:0;transition:opacity 1.6s ease 1.2s}
+#ov.lit .ov-scrim{opacity:1}
+.ov-m{position:absolute;font-family:var(--display);
+  font-size:.68rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ink2);
+  opacity:0;transition:opacity 1.3s ease 1.9s}
+#ov.lit .ov-m{opacity:1}
+.ov-tl{top:3.2vh;left:4vw}
+.ov-tr{top:3.2vh;right:4vw;color:var(--clay)}
+.ov-t{position:absolute;font-family:var(--display);
+  font-weight:400;font-size:clamp(.74rem,1.15vw,1.05rem);letter-spacing:.38em;
+  text-transform:uppercase;color:var(--ink);white-space:nowrap;
+  opacity:0;transition:opacity 1.2s ease,transform 1.6s cubic-bezier(.16,.7,.2,1)}
+.ov-years {left:8vw;  bottom:27vh; transform:translateX(-40px)}
+.ov-worlds{right:8vw; top:25vh;    transform:translateX(40px)}
+#ov.lit .ov-t{opacity:1;transform:none}
+#ov.lit .ov-years{transition-delay:1.4s}
+#ov.lit .ov-worlds{transition-delay:1.6s}
+
+.ov-ode{position:absolute;left:0;right:0;bottom:12.5vh;text-align:center;padding:0 8vw;
+  font-family:var(--display);
+  font-size:clamp(1.05rem,1.95vw,1.7rem);line-height:1.45;letter-spacing:.04em;color:var(--ink2);
+  opacity:0;transition:opacity 1.4s ease 2.15s}
+#ov.lit .ov-ode{opacity:.95}
+
+.ov-enter{position:absolute;left:50%;bottom:4.6vh;transform:translateX(-50%);
+  pointer-events:auto;background:none;border:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:.65rem;
+  font-family:var(--display);font-size:.7rem;
+  letter-spacing:.34em;text-transform:uppercase;color:var(--clay);
+  padding:.4rem 1rem 0;opacity:0;transition:opacity 1.2s ease 2.5s,color .4s}
+#ov.lit .ov-enter{opacity:1}
+.ov-enter:hover{color:#8f3c1f}
+.ov-enter:focus-visible{outline:1px solid var(--clay);outline-offset:8px;border-radius:2px}
+.ov-enter .rule{display:block;width:1px;height:28px;
+  background:linear-gradient(to bottom,rgba(194,84,46,0),rgba(194,84,46,.85))}
+.ov-enter .chev{display:block;font-size:.8rem;letter-spacing:0;font-family:var(--fallback);
+  animation:ov-breathe 3.4s ease-in-out infinite}
+@keyframes ov-breathe{0%,100%{opacity:.4;transform:translateY(0)}
+                      50%{opacity:1;transform:translateY(4px)}}
+
+.ov-grain{position:absolute;inset:-60px;pointer-events:none;opacity:.055;
+  mix-blend-mode:multiply;background-size:190px 190px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='190' height='190' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:ov-grain .55s steps(1) infinite}
+@keyframes ov-grain{
+  0%{transform:translate(0,0)}        20%{transform:translate(-14px,9px)}
+  40%{transform:translate(11px,-12px)} 60%{transform:translate(-8px,-7px)}
+  80%{transform:translate(13px,6px)}   100%{transform:translate(0,0)}}
+
+.ov-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+@media (max-width:820px){
+  .ov-t{letter-spacing:.3em}
+  .ov-years {left:6vw; bottom:30vh}
+  .ov-worlds{right:6vw; top:20vh}
+  .ov-m{font-size:.52rem;letter-spacing:.3em}
+  .ov-ode{bottom:14vh;font-size:1.08rem;padding:0 10vw}
+  .ov-halo{width:34vh;height:34vh}
+}
+@media (max-height:520px){ .ov-ode{display:none} }
+@media (prefers-reduced-motion:reduce){
+  #ov *,#ov{transition-duration:.35s!important;transition-delay:0s!important;
+    animation:none!important}
+  .ov-seven,.ov-t,.ov-sweep{transform:none!important}
+}
+
+/* ================================================================
+   THE NOTE — read while drifting through the entrance chamber.
+   ================================================================ */
+.sbeat{justify-content:center;gap:1.15rem;padding:12vh 8vw}
+.sbeat::before{content:'';position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 56% 44% at 50% 50%,
+    rgba(251,250,247,.86) 0%,rgba(251,250,247,.5) 55%,rgba(251,250,247,0) 100%)}
+.sbeat .eyebrow{font-family:var(--display);font-size:.68rem;
+  letter-spacing:.36em;text-transform:uppercase;color:var(--ink2)}
+.sbeat h2{font-family:var(--display);font-weight:400;
+  font-size:clamp(1.9rem,5.2vw,4rem);line-height:1.16;color:var(--ink);
+  letter-spacing:.02em;max-width:18ch;text-wrap:balance}
+.sbeat h2 em{font-style:normal;color:var(--clay)}
+.sbeat p{font-family:var(--display);
+  font-size:clamp(1.1rem,2.1vw,1.7rem);line-height:1.6;letter-spacing:.025em;
+  color:var(--ink);max-width:40ch;text-wrap:pretty}
+.sbeat p.lead{color:#2b2823}
+.sbeat p.quiet{font-family:var(--display);font-style:normal;
+  font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.95;letter-spacing:.055em;
+  color:var(--ink2);max-width:52ch}
+.sbeat .cta{pointer-events:auto;margin-top:1.1rem;cursor:pointer;
+  background:none;border:1px solid rgba(28,28,26,.45);border-radius:999px;
+  padding:.85rem 1.9rem;font-family:var(--display);
+  font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);
+  transition:background .35s,color .35s,border-color .35s}
+.sbeat .cta:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.sbeat .cta:focus-visible{outline:1px solid var(--clay);outline-offset:5px}
+@media (max-width:760px){
+  .sbeat{padding:10vh 7vw;gap:1rem}
+  .sbeat p{max-width:32ch}
+}
+
+</style>
+</head>
