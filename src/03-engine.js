@@ -421,7 +421,7 @@ addPool(S(.52), Math.PI/2, 9, .5, 0xfff5e6, .10);
    substitute and the signage would come out in a fallback face. Each text
    texture therefore keeps its draw function and repaints itself once
    Nazarena is genuinely ready. */
-const NZ='"Nazarena",Georgia,serif';
+const NZ='"Y7Jost","Helvetica Neue",Arial,sans-serif';   /* canvas signage follows the type sheet */
 const REDRAW=[];
 function regTex(t,draw){ REDRAW.push(function(){ draw(); t.needsUpdate=true; }); return t; }
 if(document.fonts && document.fonts.load){
@@ -489,7 +489,7 @@ function slabTex(num){
     x.fillStyle='#f4f1ea'; x.fillRect(0,0,256,460);
     x.strokeStyle='#e6e1d6'; x.lineWidth=2; x.strokeRect(6,6,244,448);
     /* blind emboss: the numeral is pressed into the membrane, not printed */
-    x.font='400 104px '+NZ; x.textAlign='center';
+    x.font='500 104px '+NZ; x.textAlign='center';
     x.fillStyle='#ffffff'; x.fillText(num,130,254);
     x.fillStyle='#ddd7ca'; x.fillText(num,128,252);
   }
@@ -567,8 +567,8 @@ const WORLD_DEF=[
 const WORLDS=[];
 const labelMats=[];
 function label(g, id, name, x, y, z, w=1.7){
-  const t=textTex([{t:id,font:'400 88px '+NZ,lh:58},
-                   {t:name,font:'400 23px '+NZ,ls:5}],{w:512,h:180,y:76});
+  const t=textTex([{t:id,font:'500 88px '+NZ,lh:58},
+                   {t:name,font:'500 23px '+NZ,ls:5}],{w:512,h:180,y:76});
   const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*180/512),
     new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false}));
   m.position.set(x,y,z); g.add(m); labelMats.push(m.material); return m;
