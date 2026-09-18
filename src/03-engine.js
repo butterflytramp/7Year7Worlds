@@ -92,10 +92,10 @@ const KEYS=[
  [0.590, 10, 9.2, -.14, .04],
  [0.630, 7.4, 3.9, .00, .00],  /* low compression */
  [0.700, 8.0, 4.3, .04, .00],
- [0.735, 30, 26,  .00, .07],   /* vast void */
- [0.860, 28, 24, -.08, .07],
- [0.895, 16, 30,  .00, .04],   /* final chamber — cathedral */
- [1.000, 19, 34,  .10, .02],
+ [0.735, 16, 15,  .00, .04],   /* long gallery */
+ [0.860, 15, 14, -.05, .04],
+ [0.895, 14, 18,  .00, .03],   /* final room */
+ [1.000, 15, 20,  .06, .02],
 ];
 function prof(u){
   u=clamp(u,0,1);
@@ -559,7 +559,7 @@ const WORLD_DEF=[
   {id:'01',name:'RETRO GAMES',href:'./RetroGames/',u:.405,type:'wall',side:-1,c:6.4,rs:1.15,rc:5.9,hex:0x2f5cff,leak:'rgba(47,92,255,.5)',kind:'pixel',open:true,cur:'cur-w01',glimpse:glimpse01, thick:.9},
   {id:'02',name:'Y2K',href:'./Y2K/',u:.505,type:'wall',side:1,c:2.5,rs:3.6,rc:2.3,hex:0xff3366,leak:'rgba(255,51,102,.45)',kind:'chrome',open:true,cur:'cur-w02',glimpse:glimpse02, thick:.5, peel:true},
   {id:'03',name:'THE ICE AGE',href:'/iceage',u:.715,type:'wall',side:1,c:4.6,rs:3.0,rc:4.4,hex:0x64c8dc,leak:'rgba(100,200,220,.5)',kind:'shard',open:true,cur:'cur-w03',glimpse:glimpse03, thick:1.2},
-  {id:'04',name:'TO BE REVEALED',u:.765,type:'below',hex:0xe0a050,open:false},
+  {id:'04',name:'TO BE REVEALED',u:.765,type:'wall',side:1,c:5.0,rs:2.6,rc:4.2,hex:0xe0a050,open:false, thick:.9},
   {id:'05',name:'TO BE REVEALED',u:.805,type:'wall',side:-1,c:7.2,rs:3.8,rc:4.6,hex:0x9a8cff,open:false, thick:1.0, ribbon:true},
   {id:'06',name:'TO BE REVEALED',u:.842,type:'portal',hex:0x5fd0a0,open:false},
   {id:'07',name:'TO BE REVEALED',u:.985,type:'end',hex:0xffd166,open:false},
@@ -677,13 +677,13 @@ function makeWorld(w){
     frameAt(w.u,_f);
     const g=new THREE.Group(); g.position.copy(_f.P); g.up.copy(UP); g.lookAt(g.position.clone().add(_f.T)); scene.add(g); W.g=g;
     /* side bridge: group +x is the walker's right */
-    const sb=new THREE.Mesh(new THREE.BoxGeometry(11.5,.9,3.4), whiteMat); sb.position.set(7.8,-.45,0); g.add(sb);
-    const edge=new THREE.Mesh(new THREE.BoxGeometry(11.5,.03,.06),new THREE.MeshBasicMaterial({color:0xffefd6}));
-    edge.position.set(7.8,0.01,1.55); g.add(edge); const e2=edge.clone(); e2.position.z=-1.55; g.add(e2);
+    const sb=new THREE.Mesh(new THREE.BoxGeometry(4.2,.9,3.4), whiteMat); sb.position.set(5.4,-.45,0); g.add(sb);
+    const edge=new THREE.Mesh(new THREE.BoxGeometry(4.2,.03,.06),new THREE.MeshBasicMaterial({color:0xffefd6}));
+    edge.position.set(5.4,0.01,1.55); g.add(edge); const e2=edge.clone(); e2.position.z=-1.55; g.add(e2);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(3.0,.42,14,64), whiteMat);
-    ring.position.set(14.2,3.0,0); ring.rotation.y=Math.PI/2; g.add(ring);
+    ring.position.set(7.4,3.0,0); ring.rotation.y=Math.PI/2; g.add(ring);
     const slab=new THREE.Mesh(new THREE.PlaneGeometry(4.6,4.6), new THREE.MeshStandardMaterial({map:slabTex('06'),roughness:.9,side:THREE.DoubleSide}));
-    slab.position.set(14.2,3.0,0); slab.rotation.y=-Math.PI/2; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
+    slab.position.set(7.4,3.0,0); slab.rotation.y=-Math.PI/2; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
     const L=new THREE.PointLight(w.hex, 30, 24, 1.6); L.position.set(13,3.5,0); g.add(L); W.light=L;
     W.point=g.localToWorld(new THREE.Vector3(14.2,3,0)); W.normal=_f.R.clone().negate();
     W.pool=addPool(S(w.u), 0, 9, 1.2, w.hex, 0);
@@ -697,13 +697,18 @@ function makeWorld(w){
     const pos=[C.x,C.y,C.z]; for(const q of pts){ q.sub(C).multiplyScalar(1.9).add(C); pos.push(q.x,q.y,q.z); }
     const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
     const cg=new THREE.BufferGeometry(); cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); cg.setIndex(idx);
-    const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0x07090f,side:THREE.DoubleSide,fog:false}));
+    const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0x191a1e,side:THREE.DoubleSide,fog:false}));
     cap.position.addScaledVector(_f.T,6); scene.add(cap);
     /* the dark beyond: a second, dimmer skin so the end reads as depth, not a wall */
     frameAt(w.u,_f);
     const g=new THREE.Group(); g.position.copy(_f.P); g.up.copy(UP); g.lookAt(g.position.clone().sub(_f.T)); scene.add(g); W.g=g;
-    const door=new THREE.Mesh(new THREE.BoxGeometry(3.2,6,.2),new THREE.MeshStandardMaterial({color:0x0a1424,roughness:.35,metalness:.25}));
-    door.position.set(0,3,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
+    /* the last door is the numeral's material: polished chrome, hinged on
+       its left edge so the walk ends by it opening rather than by a cut */
+    const doorGeo=new THREE.BoxGeometry(3.2,6,.22); doorGeo.translate(1.6,0,0);
+    const door=new THREE.Mesh(doorGeo,new THREE.MeshStandardMaterial(
+      {color:0xf2f3f5,roughness:.075,metalness:1,envMapIntensity:1.45}));
+    door.position.set(-1.6,3,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
+    W.door7=door;
     const sill=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.1),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:.9}));
     sill.position.set(0,.06,.14); g.add(sill); W.sill=sill;
     const sg=new THREE.Mesh(new THREE.CircleGeometry(2.6,32),new THREE.MeshBasicMaterial({map:softDisc('rgba(255,209,102,.55)','rgba(255,255,255,0)'),transparent:true,depthWrite:false}));
@@ -719,22 +724,8 @@ function makeWorld(w){
 }
 for(const w of WORLD_DEF) makeWorld(w);
 
-/* the void: floor falls away between these, and a bridge crosses it */
-{
-  const s0=S(.742), s1=S(.868);
-  uni.uBridge.value.set(1, s0, s1, 0);
-  const m0=frameAt(.742,{}), m1=frameAt(.868,{});
-  const mid=m0.P.clone().add(m1.P).multiplyScalar(.5), len=m0.P.distanceTo(m1.P)+3;
-  const g=new THREE.Group(); g.position.copy(mid).addScaledVector(UP,-.5); g.lookAt(mid.clone().add(m1.P).sub(m0.P)); scene.add(g);
-  g.add(new THREE.Mesh(new THREE.BoxGeometry(4.6,1.0,len), whiteMat));
-  for(const sd of [-1,1]){ const e=new THREE.Mesh(new THREE.BoxGeometry(.05,.03,len),new THREE.MeshBasicMaterial({color:0xffefd6}));
-    e.position.set(sd*2.2,.51,0); g.add(e); }
-  /* the abyss */
-  const ab=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshBasicMaterial({color:0x101218,fog:false}));
-  ab.rotation.x=-Math.PI/2; ab.position.set(mid.x,-30,mid.z); scene.add(ab);
-  /* soft under-light so the bridge reads against the dark */
-  const ul=new THREE.PointLight(0x9ab0ff, 25, 60, 1.4); ul.position.copy(mid).addScaledVector(UP,-14); scene.add(ul);
-}
+/* The floor runs unbroken to the end: the void, its bridge and the abyss
+   beneath were reading as a hole in the building rather than a room. */
 
 /* World 02 — the architecture peels upward off its opening */
 {
@@ -779,12 +770,6 @@ for(const w of WORLD_DEF) makeWorld(w);
   const tiny=(u,side,y,txt,w=1.4)=>{ const v=vForY(u,side,y); const g=surfaceGroup(u,v,.02);
     const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*60/512),new THREE.MeshBasicMaterial({map:textTex([{t:txt,font:'400 21px '+NZ,ls:5}],{w:512,h:60,y:40}),transparent:true,depthWrite:false}));
     g.add(m); };
-  tiny(.06,1,1.35,'YOU ARE HERE. (ROUGHLY.)');
-  tiny(.19,-1,1.5,'MIND THE ARCHITECTURE. IT MINDS YOU.',1.6);
-  tiny(.30,-1,1.5,'SEVEN RIBS. WE COUNTED TWICE.');
-  tiny(.665,1,1.3,'PLEASE DUCK. (YOU DON’T HAVE TO.)',1.5);
-  tiny(.90,-1,1.5,'DO NOT FEED THE VOID.');
-  tiny(.955,1,1.45,'KNOCK. WE’RE IN.');
   /* on the floor, under the ceiling seam, where the seven ribs line up */
   frameAt(.385,_f); const fg=new THREE.Group(); fg.position.copy(surf(.385,-Math.PI/2)).addScaledVector(UP,.02);
   fg.rotation.set(-Math.PI/2,0,0); fg.rotateOnWorldAxis(UP, Math.atan2(-_f.T.x,-_f.T.z)); scene.add(fg);
@@ -953,7 +938,7 @@ const acts=[...document.querySelectorAll('.act')].map(el=>{
 });
 const hint=document.getElementById('hint'), soon=document.getElementById('soon');
 const whiteout=document.getElementById('whiteout'), veil=document.getElementById('veil');
-const reveal=document.getElementById('reveal'), rvL=reveal.querySelector('.l'), rvR=reveal.querySelector('.r'), rvLine=reveal.querySelector('.line');
+/* the parting halves are retired: the numeral is the threshold now */
 const nav=document.getElementById('nav'), rail=document.getElementById('rail');
 const navBtns=[];
 WORLDS.forEach((W,i)=>{
@@ -1060,14 +1045,11 @@ function frame(){
   smx+=(mx-smx)*.05; smy+=(my-smy)*.05;
   uni.uTime.value=t;
 
-  /* the way in: overture leaves dark; a line of light; the halves part */
-  const q=sstep(.062,.112,p);
-  rvLine.style.opacity=(sstep(0,.3,q)*(1-sstep(.85,1,q))).toFixed(3);
-  rvLine.style.width=(2+14*sstep(.15,.45,q)).toFixed(1)+'px';
-  const part=sstep(.3,1,q);
-  rvL.style.transform='translateX('+(-part*102).toFixed(2)+'%)';
-  rvR.style.transform='translateX('+(part*102).toFixed(2)+'%)';
-  reveal.style.display=q>=1?'none':'';
+  /* The way in is now the numeral itself: the visitor passes through the 7,
+     so the corridor must already be standing behind it. The parting halves
+     and their line of light are superseded — two thresholds in three seconds
+     read as a stutter, and the halves would have shown black through the
+     counter of the 7 exactly when the corridor should be visible. */
 
   /* walk */
   const creep=.006*sstep(.09,.12,p);
@@ -1135,6 +1117,11 @@ function frame(){
           arr[i*3]=M.dx[i]+Math.sin(t*.7+i)*.2; arr[i*3+1]=M.dy[i]+Math.sin(t*.5+i*2)*.3-(isFog?d.rc*.5:0); arr[i*3+2]=-1+k*(isFog?7:6); }
         M.mg.attributes.position.needsUpdate=true;
         M.pts.material.opacity=(isFog?.16:.85)*(.25+.75*pr); }
+    }
+    if(W.door7){
+      const open=sstep(.55,1,pr);                 /* arrive -> it opens */
+      W.door7.rotation.y=-open*1.12;
+      document.documentElement.classList.toggle('door7-open',open>.72);
     }
     if(W.sill){ const kn=Math.max(0,1-(t-knockT)*1.4);
       W.sill.material.opacity=.75+.2*Math.sin(t*2.2)+kn*(Math.random()<.5?-.5:.3); W.sillGlow.material.opacity=.75+kn*.4*Math.random(); }

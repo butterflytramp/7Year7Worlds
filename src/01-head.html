@@ -74,6 +74,11 @@
   .plaq{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;
     max-width:430px;padding:.2rem 0 .2rem 1.1rem;border-left:1px solid rgba(28,28,26,.5)}
   .plaq .lbl{transition:color .6s ease}
+  /* legibility over dark stretches without a visible plate: the halo is the
+     paper colour, so it vanishes against the walls and only reads over dark */
+  .plaq .num,.plaq .lbl,.plaq .thesis,.plaq p.story,.plaq .enter{
+    text-shadow:0 0 3px rgba(251,250,247,.92),0 0 12px rgba(251,250,247,.75)}
+  .plaq{box-shadow:-1px 0 10px rgba(251,250,247,.55)}
     .plaq .num{font-family:var(--display);
     font-size:2.35rem;line-height:1;color:var(--ink);transition:color .6s}
   .plaq p.story,.plaq .thesis{color:#3a362e;font-size:clamp(1rem,1.4vw,1.2rem)}
@@ -87,14 +92,24 @@
   .invite{display:flex;gap:16px;align-items:center;margin-top:.4rem}
   .invite img{width:98px;height:98px;border:1px solid rgba(28,28,26,.15);border-radius:8px;display:block}
   .invite .txt{font-family:var(--display);font-size:.68rem;letter-spacing:.18em;line-height:2;color:var(--ink2)}
-  .plaq.brass{border-left:none;padding:1.05rem 1.25rem .85rem;border-radius:3px;
-    background:linear-gradient(168deg,#d9b878,#c39d55 42%,#e3c286 58%,#b58f49);
-    box-shadow:0 5px 16px rgba(60,40,10,.28), inset 0 1px 0 rgba(255,240,200,.8),
-      inset 0 -1px 0 rgba(80,55,15,.4)}
-  .plaq.brass .lbl,.plaq.brass .num{color:#4a3a1c}
-  .plaq.brass .thesis,.plaq.brass p.story{color:#2e2410}
-  .plaq.brass p.story strong{color:#1d1608}
-  .plaq.brass .invite .txt{color:#4a3a1c}
+  /* The invite is the numeral's material: the sharp light-to-dark band across
+     the middle is what makes a flat gradient read as polished metal. */
+  .plaq.chrome{border-left:none;padding:1.15rem 1.35rem .95rem;border-radius:3px;
+    background:linear-gradient(163deg,#fdfdfe 0%,#e9ecf0 13%,#c4c9d1 29%,
+      #8f959f 45%,#70767f 51%,#babdc3 57%,#e7e4de 71%,#d4cfc5 85%,#f3f0ea 100%);
+    box-shadow:0 6px 22px rgba(40,42,48,.26),
+      inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(60,64,72,.42);
+    opacity:0;transform:translateY(10px);
+    transition:opacity .9s ease,transform .9s cubic-bezier(.16,.72,.2,1)}
+  /* item 9: it is what is behind the last door, so it arrives with it */
+  html.door7-open .plaq.chrome{opacity:1;transform:none}
+  .plaq.chrome .lbl,.plaq.chrome .num{color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+  .plaq.chrome .thesis,.plaq.chrome p.story{color:#1c1e22;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+  .plaq.chrome p.story strong{color:#0e0f12}
+  .plaq.chrome .invite .txt{color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+  /* the code has to stay scannable, so it keeps a flat white plate */
+  .plaq.chrome .invite img{background:#fff;padding:5px;border:0;
+    box-shadow:0 1px 4px rgba(30,32,38,.35)}
 
   /* custom cursors on portal hover */
   body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}
@@ -140,16 +155,17 @@
   #nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;
     gap:22px;padding:14px 22px 16px;pointer-events:none;
     font-family:var(--display);font-size:.66rem;letter-spacing:.2em;color:var(--ink2);
+    text-shadow:0 0 3px rgba(251,250,247,.9),0 0 10px rgba(251,250,247,.7);
     opacity:0;transition:opacity .8s}
   #nav.on{opacity:1}
   #nav .brand{white-space:nowrap;color:var(--ink)}
   #nav .rail{flex:1;display:flex;align-items:center}
   #nav .rail button{pointer-events:auto;background:none;border:0;cursor:pointer;
-    font:inherit;letter-spacing:inherit;color:var(--faint);padding:6px 2px;transition:color .4s}
+    font:inherit;letter-spacing:inherit;color:#8a857a;padding:6px 2px;transition:color .4s}
   #nav .rail button.on{color:var(--ink)}
   #nav .rail button.open{color:var(--ink2)}
   #nav .rail button.open.on{color:var(--ink)}
-  #nav .rail i{flex:1;height:1px;background:rgba(28,28,26,.18);position:relative;overflow:hidden}
+  #nav .rail i{flex:1;height:1px;background:rgba(28,28,26,.30);position:relative;overflow:hidden}
   #nav .rail i b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ink)}
   #nav .snd{pointer-events:auto;background:none;border:0;cursor:pointer;font:inherit;
     letter-spacing:inherit;color:var(--ink2);white-space:nowrap;padding:6px 0}

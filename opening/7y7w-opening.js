@@ -1,7 +1,7 @@
 /* 7Y7W opening, revision 2. The approved chrome artwork is the hero in every frame. */
 const ASSETS = {
   chrome: new URL('./assets/chrome-seven.png', import.meta.url).href,
-  poppins: new URL('./fonts/Poppins-SemiBold.ttf', import.meta.url).href,
+  poppins: new URL('./fonts/Poppins-Light.woff', import.meta.url).href,
   jost: new URL('./fonts/Jost-Variable.ttf', import.meta.url).href,
   mono: new URL('./fonts/IBMPlexMono-Medium.ttf', import.meta.url).href,
 };
@@ -11,7 +11,7 @@ const easeOut = v => 1 - (1 - clamp(v)) ** 3;
 let fontTask;
 function loadFonts() {
   return fontTask ||= Promise.allSettled([
-    ['Y7WPoppins', ASSETS.poppins, '600'], ['Y7WJost', ASSETS.jost, '100 900'], ['Y7WMono', ASSETS.mono, '500'],
+    ['Y7WPoppins', ASSETS.poppins, '300'], ['Y7WJost', ASSETS.jost, '100 900'], ['Y7WMono', ASSETS.mono, '500'],
   ].map(async ([family, url, weight]) => {
     const face = new FontFace(family, `url("${url}")`, { weight, display: 'swap' });
     document.fonts.add(face);
@@ -19,22 +19,22 @@ function loadFonts() {
   }));
 }
 const styles = `
-  :host { display:block; position:relative; height:var(--y7w-total-height,210svh); isolation:isolate; background:#f6f3ee; color:#191a1b; --y7w-paper:#f6f3ee; --y7w-accent:#975017; font-synthesis:none; -webkit-font-smoothing:antialiased; }
+  :host { display:block; position:relative; height:var(--y7w-total-height,210svh); isolation:isolate; background:transparent; color:#191a1b; --y7w-paper:#f6f3ee; --y7w-accent:#975017; font-synthesis:none; -webkit-font-smoothing:antialiased; }
   :host([hidden]) { display:none !important; }
   :host([scroll-mode="external"]),:host([static]),:host(.reduced) { height:100svh; }
   *,*::before,*::after { box-sizing:border-box; }
-  .viewport { position:sticky; top:0; width:100%; height:100svh; overflow:hidden; background:#000; isolation:isolate; }
+  .viewport { position:sticky; top:0; width:100%; height:100svh; overflow:hidden; background:rgba(0,0,0,var(--shell,1)); isolation:isolate; }
   .ambient { position:absolute; inset:0; background:var(--y7w-paper); opacity:var(--ambient,0); }
   .ambient::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 47% 37%,#fffdf9 0%,#f8f5f0 48%,#f1ede7 100%); opacity:var(--atmosphere,1); }
   .stage { position:absolute; width:min(100%,177.6833svh); aspect-ratio:1672/941; top:50%; left:50%; transform:translate(-50%,-50%); container-type:inline-size; }
-  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:44% 87%; opacity:var(--art-opacity,0); pointer-events:none; }
+  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:46% 34%; opacity:var(--art-opacity,0); pointer-events:none; }
   .chrome,.sheen { position:absolute; display:block; width:100%; height:100%; object-fit:contain; }
   .chrome { filter:brightness(var(--exposure,1)); }
   .sheen { filter:brightness(1.35) saturate(.55); opacity:var(--sheen,0); mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); }
   .ground { position:absolute; left:17%; top:92.1%; width:82%; height:1.3%; background:radial-gradient(ellipse,#3e37302d 0%,#3e37300b 48%,transparent 73%); transform:translateY(-50%); filter:blur(1.3px); opacity:var(--ground,0); }
   .reflection { position:absolute; left:0; top:92.1%; width:100%; height:8%; overflow:hidden; opacity:var(--reflection,0); mask-image:linear-gradient(#000,transparent); -webkit-mask-image:linear-gradient(#000,transparent); }
   .reflection img { position:absolute; width:100%; height:auto; top:0; transform:translateY(-92.1%) scaleY(-1); transform-origin:50% 92.1%; filter:blur(4px); }
-  .studio { position:absolute; z-index:2; top:3.65%; left:0; width:100%; margin:0; text-align:center; color:#686868; font:600 1.4354cqw/1.35 Y7WPoppins,Poppins,sans-serif; letter-spacing:0; opacity:var(--studio,0); transform:translateY(var(--studio-y,7px)); }
+  .studio { position:absolute; z-index:2; top:3.65%; left:0; width:100%; margin:0; text-align:center; color:#686868; font:300 1.4354cqw/1.35 Y7WPoppins,Poppins,sans-serif; letter-spacing:0; opacity:var(--studio,0); transform:translateY(var(--studio-y,7px)); }
   .word { position:absolute; z-index:2; margin:0; font:500 3.7081cqw/1.15 Y7WJost,Jost,sans-serif; letter-spacing:.19em; }
   .years { left:8.97%; top:59.61%; opacity:var(--years,0); transform:translate(var(--years-x,0cqw),var(--years-y,12px)) rotate(var(--years-angle,0deg)); }
   .worlds { left:73.8%; top:22.32%; opacity:var(--worlds,0); transform:translate(var(--worlds-x,0cqw),var(--worlds-y,12px)) rotate(var(--worlds-angle,0deg)); }
@@ -220,18 +220,23 @@ export class SevenWorldsOpening extends HTMLElement {
 
   _paint(r,p) {
     const movement=smooth(.06,.88,p), out=smooth(.57,1,p);
+    /* the pass-through: the numeral comes at you and the room behind it is
+       the corridor, seen through its own counter. Squared so it reads as
+       acceleration rather than a zoom. */
+    const thru=smooth(.62,1,p), rush=thru*thru;
     const studio=smooth(.55,.81,r)*(1-smooth(.35,.74,p));
     const years=smooth(.58,.85,r)*(1-smooth(.32,.77,p));
     const worlds=smooth(.62,.89,r)*(1-smooth(.37,.82,p));
     const copy=smooth(.70,.94,r)*(1-smooth(.22,.64,p));
     const button=smooth(.79,1,r)*(1-smooth(.13,.52,p));
     const values={
-      ambient:smooth(.29,.76,r), atmosphere:1-smooth(.65,1,p),
-      'art-opacity':smooth(.055,.36,r)*(1-out),
+      ambient:smooth(.29,.76,r)*(1-thru), atmosphere:1-smooth(.65,1,p),
+      shell:1-thru,
+      'art-opacity':smooth(.055,.36,r)*(1-smooth(.955,1,p)),
       exposure:.06+.94*smooth(.10,.51,r),
       sheen:smooth(.06,.17,r)*(1-smooth(.32,.58,r))*.52,
       light:`${-8+smooth(.045,.57,r)*126}%`,
-      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement,
+      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement+15.5*rush,
       'art-y':`${-2.5*movement}%`, 'art-angle':`${-3.5*movement}deg`,
       ground:smooth(.42,.78,r)*(1-movement*.75),
       reflection:smooth(.5,.82,r)*.10*(1-movement),
