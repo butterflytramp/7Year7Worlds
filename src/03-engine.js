@@ -556,9 +556,9 @@ function surfaceGroup(u,v,standoff=0){
 const doorFX=[];
 const worldLights=[];
 const WORLD_DEF=[
-  {id:'01',name:'RETRO GAMES',href:'./RetroGames/',u:.325,type:'wall',side:-1,c:6.4,rs:1.15,rc:5.9,hex:0x2f5cff,leak:'rgba(47,92,255,.5)',kind:'pixel',open:true,cur:'cur-w01',glimpse:glimpse01, thick:.9},
+  {id:'01',name:'RETRO GAMES',href:'./RetroGames/',u:.405,type:'wall',side:-1,c:6.4,rs:1.15,rc:5.9,hex:0x2f5cff,leak:'rgba(47,92,255,.5)',kind:'pixel',open:true,cur:'cur-w01',glimpse:glimpse01, thick:.9},
   {id:'02',name:'Y2K',href:'./Y2K/',u:.505,type:'wall',side:1,c:2.5,rs:3.6,rc:2.3,hex:0xff3366,leak:'rgba(255,51,102,.45)',kind:'chrome',open:true,cur:'cur-w02',glimpse:glimpse02, thick:.5, peel:true},
-  {id:'03',name:'THE ICE AGE',href:'/iceage',u:.560,type:'wall',side:1,c:4.6,rs:3.0,rc:4.4,hex:0x64c8dc,leak:'rgba(100,200,220,.5)',kind:'shard',open:true,cur:'cur-w03',glimpse:glimpse03, thick:1.2},
+  {id:'03',name:'THE ICE AGE',href:'/iceage',u:.715,type:'wall',side:1,c:4.6,rs:3.0,rc:4.4,hex:0x64c8dc,leak:'rgba(100,200,220,.5)',kind:'shard',open:true,cur:'cur-w03',glimpse:glimpse03, thick:1.2},
   {id:'04',name:'TO BE REVEALED',u:.765,type:'wall',side:1,c:5.0,rs:2.6,rc:4.2,hex:0xe0a050,open:false, thick:.9},
   {id:'05',name:'TO BE REVEALED',u:.805,type:'wall',side:-1,c:7.2,rs:3.8,rc:4.6,hex:0x9a8cff,open:false, thick:1.0, ribbon:true},
   {id:'06',name:'TO BE REVEALED',u:.842,type:'portal',hex:0x5fd0a0,open:false},
