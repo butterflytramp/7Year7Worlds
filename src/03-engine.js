@@ -697,25 +697,27 @@ function makeWorld(w){
     const pos=[C.x,C.y,C.z]; for(const q of pts){ q.sub(C).multiplyScalar(1.9).add(C); pos.push(q.x,q.y,q.z); }
     const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
     const cg=new THREE.BufferGeometry(); cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); cg.setIndex(idx);
-    const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0x191a1e,side:THREE.DoubleSide,fog:false}));
+    const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xece7de,side:THREE.DoubleSide,fog:false}));
     cap.position.addScaledVector(_f.T,6); scene.add(cap);
     /* the dark beyond: a second, dimmer skin so the end reads as depth, not a wall */
     frameAt(w.u,_f);
     const g=new THREE.Group(); g.position.copy(_f.P); g.up.copy(UP); g.lookAt(g.position.clone().sub(_f.T)); scene.add(g); W.g=g;
     /* the last door is the numeral's material: polished chrome, hinged on
        its left edge so the walk ends by it opening rather than by a cut */
-    const doorGeo=new THREE.BoxGeometry(3.2,6,.22); doorGeo.translate(1.6,0,0);
-    const door=new THREE.Mesh(doorGeo,new THREE.MeshStandardMaterial(
-      {color:0xf2f3f5,roughness:.075,metalness:1,envMapIntensity:1.45}));
-    door.position.set(-1.6,3,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
+    /* The seventh world is opened in person, so the corridor does not end on
+       a way through — it ends on the door itself, filled with the same chrome
+       as the numeral, carrying the invitation. */
+    const door=new THREE.Mesh(new THREE.BoxGeometry(3.4,6.4,.22),new THREE.MeshStandardMaterial(
+      {color:0xf2f3f5,roughness:.07,metalness:1,envMapIntensity:1.5}));
+    door.position.set(0,3.2,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
     W.door7=door;
+    /* a shallow reveal around it so the panel reads as set into the wall */
+    const jamb=new THREE.Mesh(new THREE.BoxGeometry(3.9,6.9,.10), whiteMat);
+    jamb.position.set(0,3.2,-.09); g.add(jamb);
     const sill=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.1),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:.9}));
     sill.position.set(0,.06,.14); g.add(sill); W.sill=sill;
     const sg=new THREE.Mesh(new THREE.CircleGeometry(2.6,32),new THREE.MeshBasicMaterial({map:softDisc('rgba(255,209,102,.55)','rgba(255,255,255,0)'),transparent:true,depthWrite:false}));
     sg.rotation.x=-Math.PI/2; sg.position.set(0,.02,1.4); sg.scale.set(1.4,1,1); g.add(sg); W.sillGlow=sg;
-    /* a single vertical cut of light behind the door, floor to vault */
-    const cut=new THREE.Mesh(new THREE.PlaneGeometry(.08,30),new THREE.MeshBasicMaterial({color:0xfff0d0,fog:false}));
-    cut.position.set(0,15,-5.5); g.add(cut);
     const L=new THREE.PointLight(w.hex, 0, 30, 1.6); L.position.set(0,2,2); g.add(L); W.light=L;
     W.point=g.position.clone().addScaledVector(UP,2.5); W.normal=_f.T.clone().negate();
     W.pool=addPool(S(.975), -Math.PI/2, 8, 1.0, w.hex, 0);
@@ -1119,9 +1121,8 @@ function frame(){
         M.pts.material.opacity=(isFog?.16:.85)*(.25+.75*pr); }
     }
     if(W.door7){
-      const open=sstep(.55,1,pr);                 /* arrive -> it opens */
-      W.door7.rotation.y=-open*1.12;
-      document.documentElement.classList.toggle('door7-open',open>.72);
+      /* arriving does not open it; it brings the invitation up on its face */
+      document.documentElement.classList.toggle('door7-open',sstep(.35,.75,pr)>.5);
     }
     if(W.sill){ const kn=Math.max(0,1-(t-knockT)*1.4);
       W.sill.material.opacity=.75+.2*Math.sin(t*2.2)+kn*(Math.random()<.5?-.5:.3); W.sillGlow.material.opacity=.75+kn*.4*Math.random(); }

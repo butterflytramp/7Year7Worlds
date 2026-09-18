@@ -27,7 +27,13 @@ const styles = `
   .ambient { position:absolute; inset:0; background:var(--y7w-paper); opacity:var(--ambient,0); }
   .ambient::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 47% 37%,#fffdf9 0%,#f8f5f0 48%,#f1ede7 100%); opacity:var(--atmosphere,1); }
   .stage { position:absolute; width:min(100%,177.6833svh); aspect-ratio:1672/941; top:50%; left:50%; transform:translate(-50%,-50%); container-type:inline-size; }
-  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:26.5% 51.55%; opacity:var(--art-opacity,0); pointer-events:none; }
+  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:50% 50%; opacity:var(--art-opacity,0); pointer-events:none; }
+  /* The numeral splits down its centre and the two leaves draw apart; the
+     space they open is the way in. Each leaf carries its own sheen so the
+     light pass still runs across both faces while they part. */
+  .leaf { position:absolute; inset:0; will-change:transform; }
+  .leaf.l { clip-path:inset(0 50% 0 0); transform:translateX(calc(-1 * var(--split,0cqw))); }
+  .leaf.r { clip-path:inset(0 0 0 50%); transform:translateX(var(--split,0cqw)); }
   .chrome,.sheen { position:absolute; display:block; width:100%; height:100%; object-fit:contain; }
   .chrome { filter:brightness(var(--exposure,1)); }
   .sheen { filter:brightness(1.35) saturate(.55); opacity:var(--sheen,0); mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); }
@@ -76,8 +82,14 @@ export class SevenWorldsOpening extends HTMLElement {
           <div class="art" aria-hidden="true">
             <div class="ground"></div>
             <div class="reflection"><img src="${ASSETS.chrome}" alt="" width="1118" height="1407"></div>
-            <img class="chrome" src="${ASSETS.chrome}" alt="" width="1118" height="1407" fetchpriority="high">
-            <img class="sheen" src="${ASSETS.chrome}" alt="" width="1118" height="1407">
+            <div class="leaf l">
+              <img class="chrome" src="${ASSETS.chrome}" alt="" width="1118" height="1407" fetchpriority="high">
+              <img class="sheen" src="${ASSETS.chrome}" alt="" width="1118" height="1407">
+            </div>
+            <div class="leaf r">
+              <img class="chrome" src="${ASSETS.chrome}" alt="" width="1118" height="1407">
+              <img class="sheen" src="${ASSETS.chrome}" alt="" width="1118" height="1407">
+            </div>
             <span class="replacement">7</span>
           </div>
           <p class="studio">Studio How About That!</p>
@@ -226,7 +238,7 @@ export class SevenWorldsOpening extends HTMLElement {
     /* The counter is ~18% of the stage width, so it spans the full frame at
        5.7x and is a doorway you are through by ~8x. The room behind clears
        first, so the gap is onto the corridor from the moment it is legible. */
-    const thru=smooth(.55,1,p), rush=Math.pow(thru,1.5), open=smooth(.50,.90,p);
+    const thru=smooth(.55,1,p), part=Math.pow(thru,1.25), open=smooth(.50,.90,p);
     const studio=smooth(.55,.81,r)*(1-smooth(.35,.74,p));
     const years=smooth(.58,.85,r)*(1-smooth(.32,.77,p));
     const worlds=smooth(.62,.89,r)*(1-smooth(.37,.82,p));
@@ -239,7 +251,8 @@ export class SevenWorldsOpening extends HTMLElement {
       exposure:.06+.94*smooth(.10,.51,r),
       sheen:smooth(.06,.17,r)*(1-smooth(.32,.58,r))*.52,
       light:`${-8+smooth(.045,.57,r)*126}%`,
-      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement+7.8*rush,
+      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement+.78*thru,
+      split:`${(46*part).toFixed(2)}cqw`,
       'art-y':`${-2.5*movement}%`, 'art-angle':'0deg',
       ground:smooth(.42,.78,r)*(1-movement*.75),
       reflection:smooth(.5,.82,r)*.10*(1-movement),
