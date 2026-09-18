@@ -14,7 +14,7 @@ def read(p): return open(os.path.join(HERE,p),encoding='utf-8').read()
 html = (read('src/01-head.html') + read('src/02-body.html')
         + '<script type="module">' + read('src/03-engine.js') + read('src/04-tail.html'))
 
-MIME={'.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.woff':'font/woff'}
+MIME={'.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.woff':'font/woff','.ttf':'font/ttf'}
 def inline(m):
     fn=m.group(1); path=os.path.join(HERE,'assets',fn)
     if not os.path.exists(path): raise SystemExit('missing asset: '+fn)
