@@ -27,7 +27,7 @@ const styles = `
   .ambient { position:absolute; inset:0; background:var(--y7w-paper); opacity:var(--ambient,0); }
   .ambient::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 47% 37%,#fffdf9 0%,#f8f5f0 48%,#f1ede7 100%); opacity:var(--atmosphere,1); }
   .stage { position:absolute; width:min(100%,177.6833svh); aspect-ratio:1672/941; top:50%; left:50%; transform:translate(-50%,-50%); container-type:inline-size; }
-  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:46% 34%; opacity:var(--art-opacity,0); pointer-events:none; }
+  .art { position:absolute; left:50.83735%; top:10.4145%; width:35.1675%; aspect-ratio:1118/1407; transform:translateX(-50%) translateY(var(--art-y,0%)) scale(var(--art-scale,1.035)) rotate(var(--art-angle,0deg)); transform-origin:26.5% 51.55%; opacity:var(--art-opacity,0); pointer-events:none; }
   .chrome,.sheen { position:absolute; display:block; width:100%; height:100%; object-fit:contain; }
   .chrome { filter:brightness(var(--exposure,1)); }
   .sheen { filter:brightness(1.35) saturate(.55); opacity:var(--sheen,0); mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--light,-20%) - 25%),#000 var(--light,-20%),transparent calc(var(--light,-20%) + 30%)); }
@@ -223,21 +223,24 @@ export class SevenWorldsOpening extends HTMLElement {
     /* the pass-through: the numeral comes at you and the room behind it is
        the corridor, seen through its own counter. Squared so it reads as
        acceleration rather than a zoom. */
-    const thru=smooth(.62,1,p), rush=thru*thru;
+    /* The counter is ~18% of the stage width, so it spans the full frame at
+       5.7x and is a doorway you are through by ~8x. The room behind clears
+       first, so the gap is onto the corridor from the moment it is legible. */
+    const thru=smooth(.55,1,p), rush=Math.pow(thru,1.5), open=smooth(.50,.90,p);
     const studio=smooth(.55,.81,r)*(1-smooth(.35,.74,p));
     const years=smooth(.58,.85,r)*(1-smooth(.32,.77,p));
     const worlds=smooth(.62,.89,r)*(1-smooth(.37,.82,p));
     const copy=smooth(.70,.94,r)*(1-smooth(.22,.64,p));
     const button=smooth(.79,1,r)*(1-smooth(.13,.52,p));
     const values={
-      ambient:smooth(.29,.76,r)*(1-thru), atmosphere:1-smooth(.65,1,p),
-      shell:1-thru,
+      ambient:smooth(.29,.76,r)*(1-open), atmosphere:1-smooth(.65,1,p),
+      shell:1-open,
       'art-opacity':smooth(.055,.36,r)*(1-smooth(.955,1,p)),
       exposure:.06+.94*smooth(.10,.51,r),
       sheen:smooth(.06,.17,r)*(1-smooth(.32,.58,r))*.52,
       light:`${-8+smooth(.045,.57,r)*126}%`,
-      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement+15.5*rush,
-      'art-y':`${-2.5*movement}%`, 'art-angle':`${-3.5*movement}deg`,
+      'art-scale':1+.035*(1-smooth(.1,.85,r))+.075*movement+7.8*rush,
+      'art-y':`${-2.5*movement}%`, 'art-angle':'0deg',
       ground:smooth(.42,.78,r)*(1-movement*.75),
       reflection:smooth(.5,.82,r)*.10*(1-movement),
       studio, 'studio-y':`${(1-smooth(.55,.81,r))*7}px`,
