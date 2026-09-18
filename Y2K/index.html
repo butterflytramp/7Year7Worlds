@@ -1383,5 +1383,24 @@ function frame(){
 }
 frame();
 </script>
+
+<!-- back to the corridor -->
+<style>
+#y7w-back{position:fixed;left:18px;top:18px;z-index:2147483000;
+  display:inline-flex;align-items:center;gap:.6em;
+  padding:9px 15px 9px 13px;border-radius:2px;text-decoration:none;
+  font:500 10.5px/1 "IBM Plex Mono",ui-monospace,monospace;
+  letter-spacing:.2em;text-transform:uppercase;color:#f4f1ea;
+  background:rgba(18,19,22,.62);backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+  border:.5px solid rgba(255,255,255,.28);
+  transition:background .25s ease,border-color .25s ease}
+#y7w-back:hover{background:rgba(18,19,22,.82);border-color:rgba(255,255,255,.5)}
+#y7w-back:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#y7w-back .a{font-size:13px;line-height:0}
+@media (max-width:640px){#y7w-back{left:12px;top:12px;padding:8px 12px}}
+@media print{#y7w-back{display:none}}
+</style>
+<a id="y7w-back" href="/" aria-label="Back to the corridor"><span class="a" aria-hidden="true">&larr;</span>The corridor</a>
 </body>
 </html>
