@@ -715,9 +715,12 @@ function makeWorld(w){
     const lg=new THREE.Group(); lg.position.set(2.6,1.4,-1.9); lg.rotation.y=Math.PI/2; g.add(lg); label(lg,'06','TO BE REVEALED',0,0,0,1.5);
   }
   else if(w.type==='end'){
-    /* nothing is built here: the seventh world IS the cap that closes the
-       building, assembled after the worlds so it can find this one. */
+    /* Nothing is built here: the seventh world IS the cap that closes the
+       building, assembled after the worlds so it can find this one. It still
+       needs its light pool, though — the frame loop writes proximity into
+       poolCol[W.pool] for every world without checking. */
     frameAt(w.u,_f);
+    W.pool=addPool(S(w.u), -Math.PI/2, 11, 1.3, w.hex, 0);
     W.point=_f.P.clone().addScaledVector(UP,2.5); W.normal=_f.T.clone().negate();
   }
   return W;
@@ -1166,7 +1169,8 @@ function frame(){
   for(const W of WORLDS){
     const pr=W.prox, d=W.def;
     if(W.light) W.light.intensity=(d.open?70:d.type==='below'?60:30)*(d.type==='wall'?pr*pr:Math.max(.25,pr));
-    poolCol[W.pool].w=(d.open?.55:.28)*pr*pr;
+    /* guarded: a world without a pool slot must not take the museum down */
+    if(W.pool!==undefined&&poolCol[W.pool]) poolCol[W.pool].w=(d.open?.55:.28)*pr*pr;
     if(W.plaq){ W.plaq.classList.toggle('near',pr>.55); W.plaq.classList.toggle('tint',pr>.2); }
     if(W.inLight) W.inLight.intensity=2+8*pr;
     if(W.pic){ if(d.kind==='pixel') W.pic.material.map.offset.x=t*.03; if(d.kind==='chrome') W.pic.material.map.offset.y=-t*.05; }
