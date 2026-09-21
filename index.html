@@ -1035,12 +1035,13 @@ function makeWorld(w){
     W.v=v0; W.s=s;
     const g=surfaceGroup(w.u,v0); W.g=g;
     W.point=g.position.clone(); W.normal=g.getWorldDirection(new THREE.Vector3());
-    const depth=w.open?2.4:1.4;
+    const depth=w.open?1.6:1.2;
     const back=niche(W,g,w.rs,w.rc,depth);
     if(w.open){
       const tex=w.glimpse();
-      const pic=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+3.2,w.rc*2+3.6),
+      const pic=new THREE.Mesh(new THREE.CircleGeometry(1,96),
         new THREE.MeshBasicMaterial({map:tex}));
+      pic.scale.set(w.rs+1.9, w.rc+2.2, 1);   /* covers the opening from 3m in — closer than the camera ever gets */
       pic.position.z=-depth+.05; g.add(pic); W.pic=pic;
       pic.userData={kind:'door',W}; clickables.push(pic);
       /* a veil of the world's colour hanging in the opening, for the raycast and the leak */
@@ -1071,8 +1072,9 @@ function makeWorld(w){
       const inL=new THREE.PointLight(w.hex, 0, depth*3, 1.8); inL.position.set(0,0,-depth*.4); g.add(inL); W.inLight=inL;
     } else {
       /* sealed: a membrane with the numeral, a breath of colour behind it */
-      const slab=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+2.6,w.rc*2+3.0),
+      const slab=new THREE.Mesh(new THREE.CircleGeometry(1,96),
         new THREE.MeshStandardMaterial({map:slabTex(w.id),roughness:.9}));
+      slab.scale.set(w.rs+1.5, w.rc+1.8, 1); W.slabBase={x:w.rs+1.5,y:w.rc+1.8};
       slab.position.z=-.35; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
       const inL=new THREE.PointLight(w.hex, 2.5, 10, 2); inL.position.set(0,0,-.3); g.add(inL);
       const glow=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+1.2,w.rc*2+1.2),
@@ -1224,7 +1226,7 @@ function hangArt(src, ratio, h, u, side, y=2.6){
   const v=vForY(u,side,y);
   const g=surfaceGroup(u,v,.19);
   /* built the way a frame is built: backing, print, window mat, moulding */
-  const bk=new THREE.Mesh(new THREE.BoxGeometry(w+.18,h+.18,.05),frameMatDark); bk.position.z=.052; g.add(bk);
+  const bk=new THREE.Mesh(new THREE.BoxGeometry(w+.18,h+.18,.05),frameMatDark); bk.position.z=.025; g.add(bk);
   const tex=texLoader.load(ART_DATA[src]); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
   const art=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex})); art.position.z=.068; g.add(art);
   art.userData={kind:'art',grp:g}; clickables.push(art);
@@ -1588,7 +1590,9 @@ function frame(){
     }
     if(W.sill){ const kn=Math.max(0,1-(t-knockT)*1.4);
       W.sill.material.opacity=.75+.2*Math.sin(t*2.2)+kn*(Math.random()<.5?-.5:.3); W.sillGlow.material.opacity=.75+kn*.4*Math.random(); }
-    if(W.slab){ const want=(hovered===W.slab)?1.04:1; W.slab.scale.x+=(want-W.slab.scale.x)*.1; W.slab.scale.y+=(want-W.slab.scale.y)*.1; }
+    if(W.slab&&W.slabBase){ const k=(hovered===W.slab)?1.04:1;
+      W.slab.scale.x+=(W.slabBase.x*k-W.slab.scale.x)*.1;
+      W.slab.scale.y+=(W.slabBase.y*k-W.slab.scale.y)*.1; }
   }
   if(snd&&snd.on){ snd.sig[0].g.gain.value=snd.sig[0].k*Math.pow(WORLDS[0].prox,2);
     snd.sig[1].g.gain.value=snd.sig[1].k*Math.pow(WORLDS[1].prox,2); snd.sig[2].g.gain.value=snd.sig[2].k*Math.pow(WORLDS[2].prox,2); }
