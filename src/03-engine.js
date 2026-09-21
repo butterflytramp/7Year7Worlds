@@ -726,6 +726,24 @@ function makeWorld(w){
       {color:0xf2f3f5,roughness:.07,metalness:1,envMapIntensity:1.5}));
     door.position.set(0,3.2,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
     W.door7=door;
+    /* The seventh world's plate, set into the chrome: the artwork sits in the
+       upper two thirds behind a bevelled bezel, leaving the lower chrome for
+       the invitation. Sized off the file's own 664x834 so nothing is cropped
+       and nothing is stretched. */
+    {
+      const AW=2.66, AH=AW*834/664, AY=4.15;
+      const bez=new THREE.Mesh(new THREE.BoxGeometry(AW+.18,AH+.18,.05),
+        new THREE.MeshStandardMaterial({color:0x9aa0a8,roughness:.22,metalness:1,envMapIntensity:1.1}));
+      bez.position.set(0,AY,.115); g.add(bez);
+      const tx=new THREE.TextureLoader().load('/art/world07-hand.jpg');
+      tx.colorSpace=THREE.SRGBColorSpace;
+      const plate=new THREE.Mesh(new THREE.PlaneGeometry(AW,AH),
+        new THREE.MeshBasicMaterial({map:tx}));
+      plate.position.set(0,AY,.146); g.add(plate);
+      plate.userData={kind:'door7',W}; clickables.push(plate);
+      /* a low raking light so the bezel catches an edge against the door */
+      const pl=new THREE.PointLight(0xfff2e0,14,7,2); pl.position.set(-1.5,AY+1.4,1.5); g.add(pl);
+    }
     /* a shallow reveal around it so the panel reads as set into the wall */
     const jamb=new THREE.Mesh(new THREE.BoxGeometry(3.9,6.9,.10), whiteMat);
     jamb.position.set(0,3.2,-.09); g.add(jamb);

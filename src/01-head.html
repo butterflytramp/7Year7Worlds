@@ -112,10 +112,13 @@
      the middle is what makes a flat gradient read as polished metal. */
   /* the seventh world's card is not a placard off to one side — it sits on
      the door, centred, where the way through would have been */
-  .act.atdoor{justify-content:center;align-items:center;text-align:left;
-    padding:0 6vw;gap:0}
-  .act.atdoor .plaq{max-width:min(430px,74vw)}
-  @media (max-width:640px){ .act.atdoor .plaq{max-width:86vw} }
+  /* The artwork occupies the upper two thirds of the door, so the invitation
+     sits in the chrome beneath it rather than across it. */
+  .act.atdoor{justify-content:flex-end;align-items:center;text-align:left;
+    padding:0 6vw 17vh;gap:0}
+  .act.atdoor .plaq{max-width:min(370px,64vw)}
+  @media (max-width:640px){ .act.atdoor{padding-bottom:13vh}
+    .act.atdoor .plaq{max-width:84vw} }
   .plaq.chrome{flex-direction:column;align-items:flex-start;gap:.55rem;
     max-width:min(430px,78vw);border-left:none;padding:1.15rem 1.35rem .95rem;border-radius:3px;
     background:linear-gradient(163deg,#fdfdfe 0%,#e9ecf0 13%,#c4c9d1 29%,
