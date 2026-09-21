@@ -499,20 +499,30 @@ const S=u=>u*LEN;
 /* ============ THE SECTION ============
    u, full width, height, lean (asymmetry), bulge (ribboning) */
 const KEYS=[
- [0.000, 22, 17,  .00, .00],   /* wide entrance chamber */
- [0.100, 20, 15,  .12, .05],
- [0.150, 5.6, 6.4, .00, .02],  /* narrow passage */
- [0.230, 6.2, 7.0,-.08, .03],
- [0.280, 15, 26,  .18, .05],   /* tall atrium */
- [0.390, 14, 27,  .08, .05],
- [0.440, 9.5, 9.6, .00, .04],  /* curving gallery */
- [0.590, 10, 9.2, -.14, .04],
- [0.630, 7.4, 3.9, .00, .00],  /* low compression */
- [0.700, 8.0, 4.3, .04, .00],
- [0.735, 16, 15,  .00, .04],   /* long gallery */
- [0.860, 15, 14, -.05, .04],
- [0.895, 14, 18,  .00, .03],   /* final room */
- [1.000, 15, 20,  .06, .02],
+/* Each world stands in an identical bay: straight walls, no lean, no bulge,
+   nothing for an aperture to fight. The building does its moving between
+   them instead, so the drama is in the walk and the worlds get stillness. */
+ [0.000,   22,   17,  0.0,  0.0],
+ [0.090,   19,   14, 0.12, 0.05],
+ [0.153, 11.5, 11.5,  0.0,  0.0],   /* bay 01 opens */
+ [0.197, 11.5, 11.5,  0.0,  0.0],   /* bay 01 closes */
+ [0.245,  6.2,  7.0, -0.08, 0.03],
+ [0.293, 11.5, 11.5,  0.0,  0.0],   /* bay 02 opens */
+ [0.337, 11.5, 11.5,  0.0,  0.0],   /* bay 02 closes */
+ [0.385,   15,   25, 0.18, 0.05],
+ [0.433, 11.5, 11.5,  0.0,  0.0],   /* bay 03 opens */
+ [0.477, 11.5, 11.5,  0.0,  0.0],   /* bay 03 closes */
+ [0.525,  9.0,  8.6,  0.0, 0.04],
+ [0.573, 11.5, 11.5,  0.0,  0.0],   /* bay 04 opens */
+ [0.617, 11.5, 11.5,  0.0,  0.0],   /* bay 04 closes */
+ [0.665,  7.6,  4.2,  0.0,  0.0],
+ [0.708, 11.5, 11.5,  0.0,  0.0],   /* bay 05 opens */
+ [0.752, 11.5, 11.5,  0.0,  0.0],   /* bay 05 closes */
+ [0.795,   16,   15, -0.08, 0.04],
+ [0.838, 11.5, 11.5,  0.0,  0.0],   /* bay 06 opens */
+ [0.882, 11.5, 11.5,  0.0,  0.0],   /* bay 06 closes */
+ [0.935,   14,   18,  0.0, 0.03],
+ [1.000,   15,   20,  0.1, 0.02],
 ];
 function prof(u){
   u=clamp(u,0,1);
@@ -973,12 +983,12 @@ function surfaceGroup(u,v,standoff=0){
 const doorFX=[];
 const worldLights=[];
 const WORLD_DEF=[
-  {id:'01',name:'RETRO GAMES',href:'./RetroGames/',u:.405,type:'wall',side:-1,c:6.4,rs:1.15,rc:5.9,hex:0x2f5cff,leak:'rgba(47,92,255,.5)',kind:'pixel',open:true,cur:'cur-w01',glimpse:glimpse01, thick:.9},
-  {id:'02',name:'Y2K',href:'./Y2K/',u:.505,type:'wall',side:1,c:2.5,rs:3.6,rc:2.3,hex:0xff3366,leak:'rgba(255,51,102,.45)',kind:'chrome',open:true,cur:'cur-w02',glimpse:glimpse02, thick:.5, peel:true},
-  {id:'03',name:'THE ICE AGE',href:'/iceage',u:.715,type:'wall',side:1,c:4.6,rs:3.0,rc:4.4,hex:0x64c8dc,leak:'rgba(100,200,220,.5)',kind:'shard',open:true,cur:'cur-w03',glimpse:glimpse03, thick:1.2},
-  {id:'04',name:'TO BE REVEALED',u:.765,type:'wall',side:1,c:5.0,rs:2.6,rc:4.2,hex:0xe0a050,open:false, thick:.9},
-  {id:'05',name:'TO BE REVEALED',u:.805,type:'wall',side:-1,c:7.2,rs:3.8,rc:4.6,hex:0x9a8cff,open:false, thick:1.0, ribbon:true},
-  {id:'06',name:'TO BE REVEALED',u:.842,type:'portal',hex:0x5fd0a0,open:false},
+  {id:'01',name:'RETRO GAMES',href:'./RetroGames/',u:0.175,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x2f5cff,leak:'rgba(47,92,255,.5)',kind:'pixel',open:true,cur:'cur-w01',glimpse:glimpse01,thick:0.9},
+  {id:'02',name:'Y2K',href:'./Y2K/',u:0.315,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0xff3366,leak:'rgba(255,51,102,.45)',kind:'chrome',open:true,cur:'cur-w02',glimpse:glimpse02,thick:0.9,peel:true},
+  {id:'03',name:'THE ICE AGE',href:'/iceage',u:0.455,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x64c8dc,leak:'rgba(100,200,220,.5)',kind:'shard',open:true,cur:'cur-w03',glimpse:glimpse03,thick:0.9},
+  {id:'04',name:'TO BE REVEALED',u:0.595,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0xe0a050,open:false,thick:0.9},
+  {id:'05',name:'TO BE REVEALED',u:0.73,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x9a8cff,open:false,thick:0.9},
+  {id:'06',name:'TO BE REVEALED',u:0.86,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0x5fd0a0,open:false,thick:0.9},
   {id:'07',name:'TO BE REVEALED',u:.985,type:'end',hex:0xffd166,open:false},
 ];
 const WORLDS=[];
@@ -1165,25 +1175,7 @@ for(const w of WORLD_DEF) makeWorld(w);
   const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals();
   scene.add(new THREE.Mesh(g, whiteMat));
 }
-/* World 05 — a giant ribbon curves around the entrance */
-{
-  const W=WORLDS[4], w=W.def;
-  const P0=W.point, N=W.normal, Tg=new THREE.Vector3().crossVectors(UP,N).normalize();
-  const M=90, pos=[], idx=[]; const R=w.rs+2.6;
-  for(let k=0;k<=M;k++){
-    const th=-.55*Math.PI+ (2.05*Math.PI)*k/M;
-    const cs=Math.cos(th), sn=Math.sin(th);
-    const lift=1.3+1.4*Math.sin(th*1.5+1.0)+ .9*(k/M);
-    const c=P0.clone().addScaledVector(Tg,R*cs).addScaledVector(UP,R*sn*1.1+ w.c*0 ).addScaledVector(N,lift);
-    const rad=Tg.clone().multiplyScalar(cs).addScaledVector(UP,sn).normalize();
-    const wid=.9+.5*Math.sin(th*2);
-    const a=c.clone().addScaledVector(rad,-wid), b=c.clone().addScaledVector(rad,wid);
-    pos.push(a.x,a.y,a.z,b.x,b.y,b.z);
-    if(k<M){ const q=k*2; idx.push(q,q+1,q+2, q+1,q+3,q+2); }
-  }
-  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals();
-  scene.add(new THREE.Mesh(g, whiteMat));
-}
+/* World 05's ribbon is retired: a bay holds one opening and nothing else. */
 
 /* ============ the small print (HAT) ============ */
 {
@@ -1255,32 +1247,32 @@ function hangArt(src, ratio, h, u, side, y=2.6){
   });
 }
 /* the entrance chamber holds the first works; the curving gallery holds the rest */
-hangArt('a2.jpg',0.8,2.5,.035, 1);
-hangArt('a1.jpg',1.667,1.9,.048,-1);
-hangArt('truck.jpg',1.499,2.0,.072,-1);
-hangArt('cricket.jpg',1.664,2.1,.088, 1);
-hangArt('a9.jpg',1.57,1.5,.188,-1,2.2);
-hangArt('a3.jpg',0.8,1.8,.212, 1,2.2);
-hangArt('paperbag.jpg',1.687,2.2,.445,-1);
-hangArt('heroslider.jpg',1.723,2.0,.458, 1);
-hangArt('a4.jpg',0.8,2.2,.468,-1);
-hangArt('solvecube.jpg',1.778,1.9,.482, 1);
-hangArt('a11.jpg',0.821,2.4,.492,-1);
-hangArt('a13.jpg',0.984,2.2,.53,-1);
-hangArt('a14.jpg',0.999,2.2,.536, 1);
-hangArt('layer.jpg',1.777,1.7,.548,-1);
-hangArt('sloka.jpg',0.8,2.6,.556, 1);
-hangArt('a10.jpg',0.797,2.4,.566,-1);
-hangArt('frame-a.jpg',1.6,2.0,.575, 1);
-hangArt('a6.jpg',1.048,3.0,.585,-1,2.9);   /* hero — the mural */
-hangArt('a15.jpg',1.778,1.8,.596, 1);
-hangArt('a5.jpg',0.8,2.0,.606,-1);
-hangArt('cherrypickers.jpg',1.599,2.2,.615, 1);
-hangArt('a7.jpg',1.667,1.9,.884,-1);
-hangArt('frame-b.jpg',1.6,2.1,.898, 1);
-hangArt('frame-c.jpg',1.646,2.0,.912,-1);
-hangArt('a12.jpg',0.71,2.4,.926, 1);
-hangArt('a8.jpg',0.784,2.5,.94,-1);
+hangArt('a2.jpg',0.8,2.5,0.0116,1);
+hangArt('a1.jpg',1.667,1.9,0.0347,-1);
+hangArt('truck.jpg',1.499,2.0,0.0579,1);
+hangArt('cricket.jpg',1.664,2.1,0.0811,-1);
+hangArt('a9.jpg',1.57,1.5,0.1042,1,2.2);
+hangArt('a3.jpg',0.8,1.8,0.1274,-1,2.2);
+hangArt('paperbag.jpg',1.687,2.2,0.2223,1);
+hangArt('heroslider.jpg',1.723,2.0,0.2450,-1);
+hangArt('a4.jpg',0.8,2.2,0.2677,1);
+hangArt('solvecube.jpg',1.778,1.9,0.3623,-1);
+hangArt('a11.jpg',0.821,2.4,0.3850,1);
+hangArt('a13.jpg',0.984,2.2,0.4077,-1);
+hangArt('a14.jpg',0.999,2.2,0.5023,1);
+hangArt('layer.jpg',1.777,1.7,0.5250,-1);
+hangArt('sloka.jpg',0.8,2.6,0.5477,1);
+hangArt('a10.jpg',0.797,2.4,0.6415,-1);
+hangArt('frame-a.jpg',1.6,2.0,0.6625,1);
+hangArt('a6.jpg',1.048,3.0,0.6835,-1,2.9);   /* hero — the mural */
+hangArt('a15.jpg',1.778,1.8,0.7757,1);
+hangArt('a5.jpg',0.8,2.0,0.7950,-1);
+hangArt('cherrypickers.jpg',1.599,2.2,0.8143,1);
+hangArt('a7.jpg',1.667,1.9,0.9064,-1);
+hangArt('frame-b.jpg',1.6,2.1,0.9272,1);
+hangArt('frame-c.jpg',1.646,2.0,0.9480,-1);
+hangArt('a12.jpg',0.71,2.4,0.9688,1);
+hangArt('a8.jpg',0.784,2.5,0.9896,-1);
 
 /* ---- the modulation map ----------------------------------------------
    One texture over the shell's own parametrisation. Around each exhibit it
