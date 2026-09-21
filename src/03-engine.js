@@ -104,10 +104,10 @@ const KEYS=[
  [0.795,   16,   15, -0.08, 0.04],
  [0.838, 11.5, 11.5,  0.0,  0.0],   /* bay 06 opens */
  [0.882, 11.5, 11.5,  0.0,  0.0],   /* bay 06 closes */
- [0.905, 13.5, 14.5,  0.0, 0.03],
- [0.928, 11.5, 11.5,  0.0,  0.0],   /* bay 07 opens */
- [0.972, 11.5, 11.5,  0.0,  0.0],   /* bay 07 closes */
- [1.000, 12.5,   13,  0.0, 0.02],
+ [0.940, 12.3, 15.0,  0.0, 0.02],
+ [1.000, 13.5, 19.0,  0.0, 0.02],   /* the last chamber is the artwork's own
+    proportion — 13.5/19.0 = .711 against the file's .710 — so the arch holds
+    the whole piece, title and all, with nothing cropped away */
 ];
 function prof(u){
   u=clamp(u,0,1);
@@ -734,7 +734,7 @@ const COVER07='/art/world07-cover.jpg';  /* the seventh world's cover — swap t
 /* Where the crop sits vertically when the arch is a different shape to the
    artwork. 0 = hold the top, 1 = hold the foot. This piece carries its title
    high, and a centred crop clipped it by two pixels. */
-const COVER07_ANCHOR=.38;
+const COVER07_ANCHOR=.42;
 /* ============ the end of the building ============
    The seventh world is not an opening in a wall — it is what the corridor
    walks you toward. The cap that closes the building carries the artwork,
