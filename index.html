@@ -813,9 +813,9 @@ const darkMat=new THREE.MeshStandardMaterial({color:0x14161c, roughness:.6, meta
 /* ============ LIGHT CUTS — seven of them ============ */
 const seams=uni.uSeam.value;
 seams[0].set(Math.PI/2, 0, S(.012), S(.10));           /* entrance ceiling apex */
-seams[1].set(2.3, 0, S(.15), S(.24));                   /* narrow passage, upper left */
-seams[2].set(.62, 0, S(.298), S(.362));                 /* atrium — the bar of a 7 */
-seams[3].set(-.72, (0.62+.72)/4.2, S(.362)-4.2, S(.362)); /* — and its stroke */
+seams[1].set(2.3, 0, S(.213), S(.279));                 /* the passage itself, clear of bay 01's left wall */
+seams[2].set(.62, 0, S(.350), S(.412));                 /* atrium — the bar of a 7, clear of bay 02 */
+seams[3].set(-.72, (0.62+.72)/4.2, S(.412)-4.2, S(.412)); /* — and its stroke */
 seams[4].set(Math.PI/2, 0, S(.44), S(.60));             /* gallery apex, bending away */
 seams[5].set(-Math.PI/2+1.05, 0, S(.63), S(.705));      /* compression — floor edge */
 seams[6].set(Math.PI/2, 0, S(.737), S(.86));            /* void apex */
@@ -825,14 +825,14 @@ const pools=uni.uPool.value, poolCol=uni.uPoolCol.value;
 let poolN=0;
 function addPool(s,v,rs,rv,hex,inten){ pools[poolN].set(s,v,rs,rv); poolCol[poolN].set(...new THREE.Color(hex).toArray(),inten); return poolN++; }
 addPool(S(.045),-Math.PI/2, 7, .9, 0xfff5e6, .22);
-addPool(S(.335),-Math.PI/2, 6, .8, 0xfff5e6, .20);
+addPool(S(.385),-Math.PI/2, 6, .8, 0xfff5e6, .20);   /* atrium centre, not bay 02 */
 addPool(S(.94),-Math.PI/2, 7, .9, 0xfff5e6, .26);
 addPool(S(.52), Math.PI/2, 9, .5, 0xfff5e6, .10);
 
 /* ============ the ribs — seven, in the atrium ============ */
 {
   for(let r=0;r<7;r++){
-    const u=.293+r*.0145;
+    const u=.354+r*.0105;   /* the atrium, clear of bay 02 (.293-.337) and bay 03 (.433-.477) */
     const pts=[]; const N=new THREE.Vector3();
     for(let j=0;j<V;j+=2){ const v=-Math.PI/2+2*Math.PI*j/V;
       const p=surf(u,v); normalAt(u,v,N); p.addScaledVector(N,.32); pts.push(p); }
@@ -1003,7 +1003,9 @@ function label(g, id, name, x, y, z, w=1.7){
 }
 function niche(w, g, hw, hh, depth){
   /* the dark chamber behind the aperture, and the picture at the back of it */
-  const dk=new THREE.MeshBasicMaterial({color:0x090b12});
+  /* A shadowed room rather than a void: near-black read as a tear in the
+     building wherever an edge showed past the aperture. */
+  const dk=new THREE.MeshStandardMaterial({color:0x4a453e,roughness:.95,metalness:0,side:THREE.DoubleSide});
   const back=new THREE.Mesh(new THREE.PlaneGeometry(hw*2+2.5,hh*2+2.5), dk); back.position.z=-depth; g.add(back);
   for(const sd of [-1,1]){
     const sw=new THREE.Mesh(new THREE.PlaneGeometry(depth,hh*2+2.5), dk);
@@ -1033,11 +1035,11 @@ function makeWorld(w){
     W.v=v0; W.s=s;
     const g=surfaceGroup(w.u,v0); W.g=g;
     W.point=g.position.clone(); W.normal=g.getWorldDirection(new THREE.Vector3());
-    const depth=w.open?4.2:1.6;
+    const depth=w.open?2.4:1.4;
     const back=niche(W,g,w.rs,w.rc,depth);
     if(w.open){
       const tex=w.glimpse();
-      const pic=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+2.2,w.rc*2+2.2),
+      const pic=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+3.2,w.rc*2+3.6),
         new THREE.MeshBasicMaterial({map:tex}));
       pic.position.z=-depth+.05; g.add(pic); W.pic=pic;
       pic.userData={kind:'door',W}; clickables.push(pic);
