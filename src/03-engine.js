@@ -654,9 +654,9 @@ function makeWorld(w){
       const inL=new THREE.PointLight(w.hex, 0, depth*3, 1.8); inL.position.set(0,0,-depth*.4); g.add(inL); W.inLight=inL;
     } else {
       /* sealed: a membrane with the numeral, a breath of colour behind it */
-      const slab=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+.4,w.rc*2+.4),
+      const slab=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+2.6,w.rc*2+3.0),
         new THREE.MeshStandardMaterial({map:slabTex(w.id),roughness:.9}));
-      slab.position.z=-.55; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
+      slab.position.z=-.35; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
       const inL=new THREE.PointLight(w.hex, 2.5, 10, 2); inL.position.set(0,0,-.3); g.add(inL);
       const glow=new THREE.Mesh(new THREE.PlaneGeometry(w.rs*2+1.2,w.rc*2+1.2),
         new THREE.MeshBasicMaterial({color:w.hex,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false}));
@@ -790,7 +790,7 @@ function ringGeo(ow,oh,iw,ih,d){
   out.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); out.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3)); out.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
   return out;
 }
-const frameMatDark=new THREE.MeshStandardMaterial({color:0x2e2a26,roughness:.85});
+const frameMatDark=new THREE.MeshStandardMaterial({color:0xd7d2c7,roughness:.88});
 const matMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92});
 const mouldMat=new THREE.MeshStandardMaterial({color:0xf1eee6,roughness:.5,metalness:.05,envMapIntensity:.45});
 /* Measured off the actual files: mean luminance and saturation of every work
@@ -807,7 +807,7 @@ function hangArt(src, ratio, h, u, side, y=2.6){
   const v=vForY(u,side,y);
   const g=surfaceGroup(u,v,.19);
   /* built the way a frame is built: backing, print, window mat, moulding */
-  const bk=new THREE.Mesh(new THREE.BoxGeometry(w+.26,h+.26,.06),frameMatDark); bk.position.z=.03; g.add(bk);
+  const bk=new THREE.Mesh(new THREE.BoxGeometry(w+.18,h+.18,.05),frameMatDark); bk.position.z=.052; g.add(bk);
   const tex=texLoader.load(ART_DATA[src]); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
   const art=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex})); art.position.z=.068; g.add(art);
   art.userData={kind:'art',grp:g}; clickables.push(art);
@@ -832,21 +832,21 @@ function hangArt(src, ratio, h, u, side, y=2.6){
   });
 }
 /* the entrance chamber holds the first works; the curving gallery holds the rest */
-hangArt('a2.jpg',0.8,2.5,0.0116,1);
-hangArt('a1.jpg',1.667,1.9,0.0347,-1);
-hangArt('truck.jpg',1.499,2.0,0.0579,1);
-hangArt('cricket.jpg',1.664,2.1,0.0811,-1);
-hangArt('a9.jpg',1.57,1.5,0.1042,1,2.2);
-hangArt('a3.jpg',0.8,1.8,0.1274,-1,2.2);
-hangArt('paperbag.jpg',1.687,2.2,0.2223,1);
-hangArt('heroslider.jpg',1.723,2.0,0.2450,-1);
-hangArt('a4.jpg',0.8,2.2,0.2677,1);
-hangArt('solvecube.jpg',1.778,1.9,0.3623,-1);
-hangArt('a11.jpg',0.821,2.4,0.3850,1);
-hangArt('a13.jpg',0.984,2.2,0.4077,-1);
-hangArt('a14.jpg',0.999,2.2,0.5023,1);
-hangArt('layer.jpg',1.777,1.7,0.5250,-1);
-hangArt('sloka.jpg',0.8,2.6,0.5477,1);
+hangArt('a2.jpg',0.8,2.5,0.0099,1);
+hangArt('a1.jpg',1.667,1.9,0.0298,-1);
+hangArt('truck.jpg',1.499,2.0,0.0496,1);
+hangArt('cricket.jpg',1.664,2.1,0.0695,-1);
+hangArt('a9.jpg',1.57,1.5,0.0894,1,2.2);
+hangArt('a3.jpg',0.8,1.8,0.1092,-1,2.2);
+hangArt('paperbag.jpg',1.687,2.2,0.1291,1);
+hangArt('heroslider.jpg',1.723,2.0,0.2195,-1);
+hangArt('a4.jpg',0.8,2.2,0.2365,1);
+hangArt('solvecube.jpg',1.778,1.9,0.2535,-1);
+hangArt('a11.jpg',0.821,2.4,0.2705,1);
+hangArt('a13.jpg',0.984,2.2,0.4995,-1);
+hangArt('a14.jpg',0.999,2.2,0.5165,1);
+hangArt('layer.jpg',1.777,1.7,0.5335,-1);
+hangArt('sloka.jpg',0.8,2.6,0.5505,1);
 hangArt('a10.jpg',0.797,2.4,0.6415,-1);
 hangArt('frame-a.jpg',1.6,2.0,0.6625,1);
 hangArt('a6.jpg',1.048,3.0,0.6835,-1,2.9);   /* hero — the mural */
@@ -1058,11 +1058,12 @@ addEventListener('pageshow',function(){
   target=h>0?scrollY/h:0; p=target;
 });
 function enterWorld(W){
-  if(trans) return;
-  trans={W, t0:clock.elapsedTime, dur:2.1, from:camera.position.clone(), look:camLook.clone(), fov:camera.fov};
-  veil.style.background='#'+W.def.hex.toString(16).padStart(6,'0');
-  if(W.def.kind==='shard') veil.style.background='radial-gradient(circle at 50% 50%, #ffffff 0%, #dbe9f2 45%, #64c8dc 100%)';
-  if(W.def.kind==='chrome') veil.style.background='linear-gradient(180deg,#ffffff,#c8ccd4 40%,#ff3366)';
+  /* A world opens in its own tab, so the corridor is never left and there is
+     nothing to come back to. The open has to happen inside the click itself —
+     fired later, from the end of a transition, a browser treats it as a popup
+     and blocks it. So there is no cinematic entry any more: the tab is the
+     entry, and this window stays exactly where the visitor left it. */
+  window.open(W.def.href,'_blank','noopener');
   document.body.classList.remove('cur-w01','cur-w02','cur-w03');
 }
 addEventListener('click',e=>{
@@ -1132,7 +1133,7 @@ function frame(){
     camera.updateProjectionMatrix();
     camLook.copy(W.point).addScaledVector(W.normal,-12);
     veil.style.opacity=sstep(.55,1,k).toFixed(3);
-    if(k>=1){ location.href=W.def.href; trans.done=true; trans.t0=1e9; }
+    if(k>=1){ trans.done=true; trans.t0=1e9; veil.style.opacity='0'; }
   }
   camera.position.copy(camPos); camera.lookAt(camLook);
   if(trans&&!trans.done&&trans.W.def.kind==='chrome'){ camera.rotateZ(.12*Math.sin(clamp((t-trans.t0)/trans.dur,0,1)*Math.PI)); }
