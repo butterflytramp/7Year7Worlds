@@ -993,7 +993,7 @@ const WORLD_DEF=[
   {id:'04',name:'TO BE REVEALED',u:0.595,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0xe0a050,open:false,thick:0.9},
   {id:'05',name:'TO BE REVEALED',u:0.73,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x9a8cff,open:false,thick:0.9},
   {id:'06',name:'TO BE REVEALED',u:0.86,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0x5fd0a0,open:false,thick:0.9},
-  {id:'07',name:'TO BE REVEALED',u:0.950,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0xffd166,open:false,thick:0.9,cover:'/art/world07-hand.jpg'},
+  {id:'07',name:'TO BE REVEALED',u:0.985,type:'end',hex:0xffd166,open:false,cover:'/art/world07-hand.jpg'},
 ];
 const WORLDS=[];
 const labelMats=[];
@@ -1133,9 +1133,12 @@ function makeWorld(w){
     W.pool=addPool(S(w.u), 0, 9, 1.2, w.hex, 0);
     const lg=new THREE.Group(); lg.position.set(2.6,1.4,-1.9); lg.rotation.y=Math.PI/2; g.add(lg); label(lg,'06','TO BE REVEALED',0,0,0,1.5);
   }
-  /* The seventh world is a wall aperture like the other six now: the door,
-     its jamb, the bezelled plate and the sill have gone. What closes the
-     corridor is the end cap, built below, outside any world. */
+  else if(w.type==='end'){
+    /* nothing is built here: the seventh world IS the cap that closes the
+       building, assembled after the worlds so it can find this one. */
+    frameAt(w.u,_f);
+    W.point=_f.P.clone().addScaledVector(UP,2.5); W.normal=_f.T.clone().negate();
+  }
   return W;
 }
 for(const w of WORLD_DEF) makeWorld(w);
@@ -1143,17 +1146,43 @@ for(const w of WORLD_DEF) makeWorld(w);
 /* The floor runs unbroken to the end: the void, its bridge and the abyss
    beneath were reading as a hole in the building rather than a room. */
 
-/* ============ the end of the building ============ */
+/* ============ the end of the building ============
+   The seventh world is not an opening in a wall — it is what the corridor
+   walks you toward. The cap that closes the building carries the artwork,
+   so the arch at the end of the tube is the work itself. UVs are built from
+   each vertex's position in the section's own plane and cover-fitted, so the
+   image fills the arch without stretching. */
 {
   const _e={}; frameAt(1,_e);
   const pts=[]; for(let j=0;j<=V;j++){ pts.push(surf(1,-Math.PI/2+2*Math.PI*j/V)); }
   const C=_e.P.clone().addScaledVector(UP,prof(1).H/2);
-  const pos=[C.x,C.y,C.z]; for(const q of pts){ q.sub(C).multiplyScalar(1.9).add(C); pos.push(q.x,q.y,q.z); }
+  const R=_e.R.clone().normalize();
+  const ring=pts.map(q=>q.clone().sub(C).multiplyScalar(1.9).add(C));
+  const loc=ring.map(q=>{ const d=q.clone().sub(C); return [d.dot(R), d.dot(UP)]; });
+  const xs=loc.map(p=>p[0]), ys=loc.map(p=>p[1]);
+  const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  const BW=x1-x0, BH=y1-y0, boxA=BW/BH, imgA=664/834;
+  const uv=(x,y)=>{
+    let u=(x-x0)/BW, v=(y-y0)/BH;
+    if(boxA>imgA) v=.5+(v-.5)*(imgA/boxA);      /* arch wider than the art: crop its height */
+    else          u=.5+(u-.5)*(boxA/imgA);      /* arch taller: crop its width */
+    return [u,v];
+  };
+  const cUV=uv(0,0);
+  const pos=[C.x,C.y,C.z], uvs=[cUV[0],cUV[1]];
+  ring.forEach((q,i)=>{ pos.push(q.x,q.y,q.z); const t=uv(loc[i][0],loc[i][1]); uvs.push(t[0],t[1]); });
   const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
   const cg=new THREE.BufferGeometry();
-  cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); cg.setIndex(idx);
-  const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xece7de,side:THREE.DoubleSide,fog:false}));
+  cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  cg.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+  cg.setIndex(idx);
+  const tx=new THREE.TextureLoader().load('/art/world07-hand.jpg');
+  tx.colorSpace=THREE.SRGBColorSpace;
+  const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide,fog:false}));
   cap.position.addScaledVector(_e.T,6); scene.add(cap);
+  const W7=WORLDS.find(x=>x.def.id==='07');
+  if(W7){ cap.userData={kind:'sealed',W:W7}; clickables.push(cap); W7.slab=cap;
+    W7.point=C.clone().addScaledVector(_e.T,6); W7.normal=_e.T.clone().negate(); }
 }
 
 /* World 02 — the architecture peels upward off its opening */
