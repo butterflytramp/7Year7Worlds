@@ -104,8 +104,10 @@ const KEYS=[
  [0.795,   16,   15, -0.08, 0.04],
  [0.838, 11.5, 11.5,  0.0,  0.0],   /* bay 06 opens */
  [0.882, 11.5, 11.5,  0.0,  0.0],   /* bay 06 closes */
- [0.935,   14,   18,  0.0, 0.03],
- [1.000,   15,   20,  0.1, 0.02],
+ [0.905, 13.5, 14.5,  0.0, 0.03],
+ [0.928, 11.5, 11.5,  0.0,  0.0],   /* bay 07 opens */
+ [0.972, 11.5, 11.5,  0.0,  0.0],   /* bay 07 closes */
+ [1.000, 12.5,   13,  0.0, 0.02],
 ];
 function prof(u){
   u=clamp(u,0,1);
@@ -572,7 +574,7 @@ const WORLD_DEF=[
   {id:'04',name:'TO BE REVEALED',u:0.595,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0xe0a050,open:false,thick:0.9},
   {id:'05',name:'TO BE REVEALED',u:0.73,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x9a8cff,open:false,thick:0.9},
   {id:'06',name:'TO BE REVEALED',u:0.86,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0x5fd0a0,open:false,thick:0.9},
-  {id:'07',name:'TO BE REVEALED',u:.985,type:'end',hex:0xffd166,open:false},
+  {id:'07',name:'TO BE REVEALED',u:0.950,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0xffd166,open:false,thick:0.9,cover:'/art/world07-hand.jpg'},
 ];
 const WORLDS=[];
 const labelMats=[];
@@ -655,8 +657,16 @@ function makeWorld(w){
       const inL=new THREE.PointLight(w.hex, 0, depth*3, 1.8); inL.position.set(0,0,-depth*.4); g.add(inL); W.inLight=inL;
     } else {
       /* sealed: a membrane with the numeral, a breath of colour behind it */
+      /* A sealed world normally shows its numeral pressed into the membrane.
+         The seventh carries artwork instead — and because the membrane is the
+         ellipse of the aperture, the image is cropped to the opening's own
+         organic shape rather than sitting in a rectangle behind it. */
+      let slabMap;
+      if(w.cover){ slabMap=new THREE.TextureLoader().load(w.cover); slabMap.colorSpace=THREE.SRGBColorSpace; }
+      else slabMap=slabTex(w.id);
       const slab=new THREE.Mesh(new THREE.CircleGeometry(1,96),
-        new THREE.MeshStandardMaterial({map:slabTex(w.id),roughness:.9}));
+        new THREE.MeshStandardMaterial({map:slabMap,roughness:w.cover?.55:.9,
+          emissive:w.cover?0x2a2430:0x000000, emissiveMap:w.cover?slabMap:null, emissiveIntensity:w.cover?.35:0}));
       slab.scale.set(w.rs+1.5, w.rc+1.8, 1); W.slabBase={x:w.rs+1.5,y:w.rc+1.8};
       slab.position.z=-.35; g.add(slab); slab.userData={kind:'sealed',W}; clickables.push(slab); W.slab=slab;
       const inL=new THREE.PointLight(w.hex, 2.5, 10, 2); inL.position.set(0,0,-.3); g.add(inL);
@@ -704,63 +714,28 @@ function makeWorld(w){
     W.pool=addPool(S(w.u), 0, 9, 1.2, w.hex, 0);
     const lg=new THREE.Group(); lg.position.set(2.6,1.4,-1.9); lg.rotation.y=Math.PI/2; g.add(lg); label(lg,'06','TO BE REVEALED',0,0,0,1.5);
   }
-  else if(w.type==='end'){
-    /* the cathedral void, and the black door within it */
-    frameAt(1,_f);
-    const pts=[]; for(let j=0;j<=V;j++){ pts.push(surf(1,-Math.PI/2+2*Math.PI*j/V)); }
-    const C=_f.P.clone().addScaledVector(UP,prof(1).H/2);
-    const pos=[C.x,C.y,C.z]; for(const q of pts){ q.sub(C).multiplyScalar(1.9).add(C); pos.push(q.x,q.y,q.z); }
-    const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
-    const cg=new THREE.BufferGeometry(); cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); cg.setIndex(idx);
-    const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xece7de,side:THREE.DoubleSide,fog:false}));
-    cap.position.addScaledVector(_f.T,6); scene.add(cap);
-    /* the dark beyond: a second, dimmer skin so the end reads as depth, not a wall */
-    frameAt(w.u,_f);
-    const g=new THREE.Group(); g.position.copy(_f.P); g.up.copy(UP); g.lookAt(g.position.clone().sub(_f.T)); scene.add(g); W.g=g;
-    /* the last door is the numeral's material: polished chrome, hinged on
-       its left edge so the walk ends by it opening rather than by a cut */
-    /* The seventh world is opened in person, so the corridor does not end on
-       a way through — it ends on the door itself, filled with the same chrome
-       as the numeral, carrying the invitation. */
-    const door=new THREE.Mesh(new THREE.BoxGeometry(3.4,6.4,.22),new THREE.MeshStandardMaterial(
-      {color:0xf2f3f5,roughness:.07,metalness:1,envMapIntensity:1.5}));
-    door.position.set(0,3.2,0); g.add(door); door.userData={kind:'door7',W}; clickables.push(door);
-    W.door7=door;
-    /* The seventh world's plate, set into the chrome: the artwork sits in the
-       upper two thirds behind a bevelled bezel, leaving the lower chrome for
-       the invitation. Sized off the file's own 664x834 so nothing is cropped
-       and nothing is stretched. */
-    {
-      const AW=2.66, AH=AW*834/664, AY=4.15;
-      const bez=new THREE.Mesh(new THREE.BoxGeometry(AW+.18,AH+.18,.05),
-        new THREE.MeshStandardMaterial({color:0x9aa0a8,roughness:.22,metalness:1,envMapIntensity:1.1}));
-      bez.position.set(0,AY,.115); g.add(bez);
-      const tx=new THREE.TextureLoader().load('/art/world07-hand.jpg');
-      tx.colorSpace=THREE.SRGBColorSpace;
-      const plate=new THREE.Mesh(new THREE.PlaneGeometry(AW,AH),
-        new THREE.MeshBasicMaterial({map:tx}));
-      plate.position.set(0,AY,.146); g.add(plate);
-      plate.userData={kind:'door7',W}; clickables.push(plate);
-      /* a low raking light so the bezel catches an edge against the door */
-      const pl=new THREE.PointLight(0xfff2e0,14,7,2); pl.position.set(-1.5,AY+1.4,1.5); g.add(pl);
-    }
-    /* a shallow reveal around it so the panel reads as set into the wall */
-    const jamb=new THREE.Mesh(new THREE.BoxGeometry(3.9,6.9,.10), whiteMat);
-    jamb.position.set(0,3.2,-.09); g.add(jamb);
-    const sill=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.1),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:.9}));
-    sill.position.set(0,.06,.14); g.add(sill); W.sill=sill;
-    const sg=new THREE.Mesh(new THREE.CircleGeometry(2.6,32),new THREE.MeshBasicMaterial({map:softDisc('rgba(255,209,102,.55)','rgba(255,255,255,0)'),transparent:true,depthWrite:false}));
-    sg.rotation.x=-Math.PI/2; sg.position.set(0,.02,1.4); sg.scale.set(1.4,1,1); g.add(sg); W.sillGlow=sg;
-    const L=new THREE.PointLight(w.hex, 0, 30, 1.6); L.position.set(0,2,2); g.add(L); W.light=L;
-    W.point=g.position.clone().addScaledVector(UP,2.5); W.normal=_f.T.clone().negate();
-    W.pool=addPool(S(.975), -Math.PI/2, 8, 1.0, w.hex, 0);
-  }
+  /* The seventh world is a wall aperture like the other six now: the door,
+     its jamb, the bezelled plate and the sill have gone. What closes the
+     corridor is the end cap, built below, outside any world. */
   return W;
 }
 for(const w of WORLD_DEF) makeWorld(w);
 
 /* The floor runs unbroken to the end: the void, its bridge and the abyss
    beneath were reading as a hole in the building rather than a room. */
+
+/* ============ the end of the building ============ */
+{
+  const _e={}; frameAt(1,_e);
+  const pts=[]; for(let j=0;j<=V;j++){ pts.push(surf(1,-Math.PI/2+2*Math.PI*j/V)); }
+  const C=_e.P.clone().addScaledVector(UP,prof(1).H/2);
+  const pos=[C.x,C.y,C.z]; for(const q of pts){ q.sub(C).multiplyScalar(1.9).add(C); pos.push(q.x,q.y,q.z); }
+  const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
+  const cg=new THREE.BufferGeometry();
+  cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); cg.setIndex(idx);
+  const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xece7de,side:THREE.DoubleSide,fog:false}));
+  cap.position.addScaledVector(_e.T,6); scene.add(cap);
+}
 
 /* World 02 — the architecture peels upward off its opening */
 {
@@ -852,32 +827,32 @@ function hangArt(src, ratio, h, u, side, y=2.6){
   });
 }
 /* the entrance chamber holds the first works; the curving gallery holds the rest */
-hangArt('a2.jpg',0.8,2.5,0.0099,1);
-hangArt('a1.jpg',1.667,1.9,0.0298,-1);
-hangArt('truck.jpg',1.499,2.0,0.0496,1);
-hangArt('cricket.jpg',1.664,2.1,0.0695,-1);
-hangArt('a9.jpg',1.57,1.5,0.0894,1,2.2);
-hangArt('a3.jpg',0.8,1.8,0.1092,-1,2.2);
-hangArt('paperbag.jpg',1.687,2.2,0.1291,1);
-hangArt('heroslider.jpg',1.723,2.0,0.2195,-1);
-hangArt('a4.jpg',0.8,2.2,0.2365,1);
-hangArt('solvecube.jpg',1.778,1.9,0.2535,-1);
-hangArt('a11.jpg',0.821,2.4,0.2705,1);
-hangArt('a13.jpg',0.984,2.2,0.4995,-1);
-hangArt('a14.jpg',0.999,2.2,0.5165,1);
-hangArt('layer.jpg',1.777,1.7,0.5335,-1);
-hangArt('sloka.jpg',0.8,2.6,0.5505,1);
-hangArt('a10.jpg',0.797,2.4,0.6415,-1);
-hangArt('frame-a.jpg',1.6,2.0,0.6625,1);
-hangArt('a6.jpg',1.048,3.0,0.6835,-1,2.9);   /* hero — the mural */
-hangArt('a15.jpg',1.778,1.8,0.7757,1);
-hangArt('a5.jpg',0.8,2.0,0.7950,-1);
-hangArt('cherrypickers.jpg',1.599,2.2,0.8143,1);
-hangArt('a7.jpg',1.667,1.9,0.9064,-1);
-hangArt('frame-b.jpg',1.6,2.1,0.9272,1);
-hangArt('frame-c.jpg',1.646,2.0,0.9480,-1);
-hangArt('a12.jpg',0.71,2.4,0.9688,1);
-hangArt('a8.jpg',0.784,2.5,0.9896,-1);
+hangArt('a2.jpg',0.8,2.5,0.0077,1);
+hangArt('a1.jpg',1.667,1.9,0.0232,-1);
+hangArt('truck.jpg',1.499,2.0,0.0386,1);
+hangArt('cricket.jpg',1.664,2.1,0.0541,-1);
+hangArt('a9.jpg',1.57,1.5,0.0695,1,2.2);
+hangArt('a3.jpg',0.8,1.8,0.0849,-1,2.2);
+hangArt('paperbag.jpg',1.687,2.2,0.1004,1);
+hangArt('heroslider.jpg',1.723,2.0,0.1158,-1);
+hangArt('a4.jpg',0.8,2.2,0.1313,1);
+hangArt('solvecube.jpg',1.778,1.9,0.2195,-1);
+hangArt('a11.jpg',0.821,2.4,0.2365,1);
+hangArt('a13.jpg',0.984,2.2,0.2535,-1);
+hangArt('a14.jpg',0.999,2.2,0.2705,1);
+hangArt('layer.jpg',1.777,1.7,0.4995,-1);
+hangArt('sloka.jpg',0.8,2.6,0.5165,1);
+hangArt('a10.jpg',0.797,2.4,0.5335,-1);
+hangArt('frame-a.jpg',1.6,2.0,0.5505,1);
+hangArt('a6.jpg',1.048,3.0,0.6389,-1,2.9);   /* hero — the mural */
+hangArt('a15.jpg',1.778,1.8,0.6546,1);
+hangArt('a5.jpg',0.8,2.0,0.6704,-1);
+hangArt('cherrypickers.jpg',1.599,2.2,0.6861,1);
+hangArt('a7.jpg',1.667,1.9,0.7718,-1);
+hangArt('frame-b.jpg',1.6,2.1,0.7834,1);
+hangArt('frame-c.jpg',1.646,2.0,0.7950,-1);
+hangArt('a12.jpg',0.71,2.4,0.8066,1);
+hangArt('a8.jpg',0.784,2.5,0.8182,-1);
 
 /* ---- the modulation map ----------------------------------------------
    One texture over the shell's own parametrisation. Around each exhibit it
@@ -1185,9 +1160,9 @@ function frame(){
         M.mg.attributes.position.needsUpdate=true;
         M.pts.material.opacity=(isFog?.16:.85)*(.25+.75*pr); }
     }
-    if(W.door7){
-      /* arriving does not open it; it brings the invitation up on its face */
-      document.documentElement.classList.toggle('door7-open',sstep(.35,.75,pr)>.5);
+    if(W.def.id==='07'){
+      /* arriving at the seventh brings the invitation up beside it */
+      document.documentElement.classList.toggle('door7-open',sstep(.30,.70,pr)>.5);
     }
     if(W.sill){ const kn=Math.max(0,1-(t-knockT)*1.4);
       W.sill.material.opacity=.75+.2*Math.sin(t*2.2)+kn*(Math.random()<.5?-.5:.3); W.sillGlow.material.opacity=.75+kn*.4*Math.random(); }
