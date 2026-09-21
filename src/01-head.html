@@ -112,29 +112,6 @@
      the middle is what makes a flat gradient read as polished metal. */
   /* the seventh world's card is not a placard off to one side — it sits on
      the door, centred, where the way through would have been */
-  /* The seventh world is an aperture in the wall now, not a door, so the
-     invitation sits beside it rather than under a chrome face. */
-  .act.atdoor{justify-content:center;align-items:center;text-align:left;
-    padding:0 6vw;gap:0}
-  .act.atdoor .plaq{max-width:min(370px,64vw)}
-  @media (max-width:640px){ .act.atdoor .plaq{max-width:84vw} }
-  .plaq.chrome{flex-direction:column;align-items:flex-start;gap:.55rem;
-    max-width:min(430px,78vw);border-left:none;padding:1.15rem 1.35rem .95rem;border-radius:3px;
-    background:linear-gradient(163deg,#fdfdfe 0%,#e9ecf0 13%,#c4c9d1 29%,
-      #8f959f 45%,#70767f 51%,#babdc3 57%,#e7e4de 71%,#d4cfc5 85%,#f3f0ea 100%);
-    box-shadow:0 6px 22px rgba(40,42,48,.26),
-      inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(60,64,72,.42);
-    opacity:0;transform:translateY(10px);
-    transition:opacity .9s ease,transform .9s cubic-bezier(.16,.72,.2,1)}
-  /* item 9: it is what is behind the last door, so it arrives with it */
-  html.door7-open .plaq.chrome{opacity:1;transform:none}
-  .plaq.chrome .lbl,.plaq.chrome .num{color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.5)}
-  .plaq.chrome .thesis,.plaq.chrome p.story{color:#1c1e22;text-shadow:0 1px 0 rgba(255,255,255,.45)}
-  .plaq.chrome p.story strong{color:#0e0f12}
-  .plaq.chrome .invite .txt{color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.5)}
-  /* the code has to stay scannable, so it keeps a flat white plate */
-  .plaq.chrome .invite img{background:#fff;padding:5px;border:0;
-    box-shadow:0 1px 4px rgba(30,32,38,.35)}
 
   /* custom cursors on portal hover */
   body.cur-w01{cursor:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M18 4a14 14 0 1 0 12.1 21L18 18z' fill='%23ffed4e'/%3E%3Ccircle cx='21' cy='11' r='2' fill='%230a0f1f'/%3E%3C/svg%3E") 18 18, pointer}

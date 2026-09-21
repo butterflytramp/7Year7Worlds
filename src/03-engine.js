@@ -574,7 +574,7 @@ const WORLD_DEF=[
   {id:'04',name:'TO BE REVEALED',u:0.595,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0xe0a050,open:false,thick:0.9},
   {id:'05',name:'TO BE REVEALED',u:0.73,type:'wall',side:-1,c:4.2,rs:3.3,rc:4.0,hex:0x9a8cff,open:false,thick:0.9},
   {id:'06',name:'TO BE REVEALED',u:0.86,type:'wall',side:1,c:4.2,rs:3.3,rc:4.0,hex:0x5fd0a0,open:false,thick:0.9},
-  {id:'07',name:'TO BE REVEALED',u:0.985,type:'end',hex:0xffd166,open:false,cover:'/art/world07-hand.jpg'},
+  {id:'07',name:'TO BE REVEALED',u:0.890,type:'end',hex:0xffd166,open:false},   /* the cover lives on COVER07; the cap carries it */
 ];
 const WORLDS=[];
 const labelMats=[];
@@ -730,6 +730,11 @@ for(const w of WORLD_DEF) makeWorld(w);
 /* The floor runs unbroken to the end: the void, its bridge and the abyss
    beneath were reading as a hole in the building rather than a room. */
 
+const COVER07='/art/world07-cover.jpg';  /* the seventh world's cover — swap this one line */
+/* Where the crop sits vertically when the arch is a different shape to the
+   artwork. 0 = hold the top, 1 = hold the foot. This piece carries its title
+   high, and a centred crop clipped it by two pixels. */
+const COVER07_ANCHOR=.38;
 /* ============ the end of the building ============
    The seventh world is not an opening in a wall — it is what the corridor
    walks you toward. The cap that closes the building carries the artwork,
@@ -745,22 +750,36 @@ for(const w of WORLD_DEF) makeWorld(w);
   const loc=ring.map(q=>{ const d=q.clone().sub(C); return [d.dot(R), d.dot(UP)]; });
   const xs=loc.map(p=>p[0]), ys=loc.map(p=>p[1]);
   const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
-  const BW=x1-x0, BH=y1-y0, boxA=BW/BH, imgA=664/834;
-  const uv=(x,y)=>{
+  const BW=x1-x0, BH=y1-y0, boxA=BW/BH;
+  /* The cover's aspect is read from the file once it loads rather than
+     hard-coded, so swapping the artwork for one of any shape re-fits it
+     instead of stretching or mis-cropping it. */
+  const uvAt=(x,y,imgA)=>{
     let u=(x-x0)/BW, v=(y-y0)/BH;
-    if(boxA>imgA) v=.5+(v-.5)*(imgA/boxA);      /* arch wider than the art: crop its height */
-    else          u=.5+(u-.5)*(boxA/imgA);      /* arch taller: crop its width */
+    if(boxA>imgA){                              /* arch wider than the art: crop its height */
+      const half=(imgA/boxA)/2, a=Math.max(half,Math.min(1-half,COVER07_ANCHOR));
+      v=a+(v-.5)*(imgA/boxA);
+    } else u=.5+(u-.5)*(boxA/imgA);             /* arch taller: crop its width */
     return [u,v];
   };
-  const cUV=uv(0,0);
-  const pos=[C.x,C.y,C.z], uvs=[cUV[0],cUV[1]];
-  ring.forEach((q,i)=>{ pos.push(q.x,q.y,q.z); const t=uv(loc[i][0],loc[i][1]); uvs.push(t[0],t[1]); });
+  const pos=[C.x,C.y,C.z];
+  ring.forEach(q=>pos.push(q.x,q.y,q.z));
+  const writeUV=imgA=>{
+    const c=uvAt(0,0,imgA), a=[c[0],c[1]];
+    loc.forEach(p=>{ const t=uvAt(p[0],p[1],imgA); a.push(t[0],t[1]); });
+    return new Float32Array(a);
+  };
+  const uvs=writeUV(boxA);   /* a neutral fit until the file reports its size */
   const idx=[]; for(let j=0;j<V;j++) idx.push(0,j+1,j+2);
   const cg=new THREE.BufferGeometry();
   cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
   cg.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
   cg.setIndex(idx);
-  const tx=new THREE.TextureLoader().load('/art/world07-hand.jpg');
+  const tx=new THREE.TextureLoader().load(COVER07, t=>{
+    const im=t.image; if(!im||!im.width) return;
+    cg.setAttribute('uv',new THREE.Float32BufferAttribute(writeUV(im.width/im.height),2));
+    cg.attributes.uv.needsUpdate=true;
+  });
   tx.colorSpace=THREE.SRGBColorSpace;
   const cap=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide,fog:false}));
   cap.position.addScaledVector(_e.T,6); scene.add(cap);
@@ -938,7 +957,10 @@ for(let i=0;i<(LOWPOWER?1:2);i++){ const L=new THREE.SpotLight(0xfffaf4,0,22,.5,
 /* ============ DIRECTOR ============ */
 /* Three bands: the overture holds, then the visitor drifts slowly through
    the entrance chamber while the note is read, then the walk proper. */
-const PD=.10, P0=.25, P1=.935, UMAX=.963, UOFF=.012, UB=.035;
+/* UMAX was .963, which put the camera at u .975 — all but touching the cap,
+   so the last world filled the screen rather than being arrived at. .888
+   stops the walk at u .90, leaving the arch in view down the corridor. */
+const PD=.10, P0=.25, P1=.935, UMAX=.888, UOFF=.012, UB=.035;
 const uToP=u=>P0+((u-UOFF-UB)/(UMAX-UB))*(P1-P0);
 const pToU=p=> p<P0 ? UOFF+clamp((p-PD)/(P0-PD),0,1)*UB
                     : UOFF+UB+clamp((p-P0)/(P1-P0),0,1)*(UMAX-UB);
